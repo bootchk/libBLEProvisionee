@@ -55,6 +55,18 @@ CMake scripts derived from https://github.com/Polidea/cmake-nRF5x
 The former creates the build directory and Makefiles.
 The latter builds.
 
+IDE projects
+-
+
+????
+
+The project in the repository is an Eclipse project.
+
+It was generated using:
+
+    https://cmake.org/Wiki/Eclipse_CDT4_Generator
+    
+
 TODO
 -
 

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.2)
+cmake_minimum_required(VERSION 3.5.1)
 
 # check if all the necessary toolchain SDK and tools paths have been provided.
 if (NOT ARM_NONE_EABI_TOOLCHAIN_PATH)
@@ -94,6 +94,9 @@ macro(nRF5x_setup)
     set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_C_COMPILER} <LINK_FLAGS> <OBJECTS> -lstdc++ -o <TARGET>")
 
     include_directories(".")
+    
+    # SDK version specific headers and sources
+    include("CMake_nRF5x_v14_2.cmake")
 
     # basic board definitions and drivers
     include_directories(
@@ -140,8 +143,7 @@ macro(nRF5x_setup)
 
     # drivers and utils
     # "${NRF5_SDK_PATH}/components/libraries/util/sdk_errors.c"
-    # "${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_serial.c"
-    # "${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_frontend.c"
+    
     list(APPEND SDK_SOURCE_FILES
             "${NRF5_SDK_PATH}/components/libraries/hardfault/hardfault_implementation.c"
             "${NRF5_SDK_PATH}/components/libraries/util/nrf_assert.c"
@@ -159,30 +161,16 @@ macro(nRF5x_setup)
             "${NRF5_SDK_PATH}/components/ble/common"
     )
 
+# Optional for capability: negotiate connection params
+# sdk_config.h>NRF_BLE_CONN_PARAMS_ENABLED
+# "${NRF5_SDK_PATH}/components/ble/common/ble_conn_params.c"
+
     list(APPEND SDK_SOURCE_FILES
             "${NRF5_SDK_PATH}/components/ble/common/ble_advdata.c"
-            "${NRF5_SDK_PATH}/components/ble/common/ble_conn_params.c"
             "${NRF5_SDK_PATH}/components/ble/common/ble_conn_state.c"
             "${NRF5_SDK_PATH}/components/ble/common/ble_srv_common.c"
             )
-          
-    # SDK 14.2 changes
-    # "experimental" seems to suggest not supported by Nordic
       
-    # support for manipulating ASM section vars
-    # used by new SD init to calculate memory reqt
-    # location of nrf_section_iter.h
-    include_directories(
-            "${NRF5_SDK_PATH}/components/libraries/experimental_section_vars"
-    )
-    
-    include_directories(
-            "${NRF5_SDK_PATH}/components/libraries/experimental_log"
-            "${NRF5_SDK_PATH}/components/libraries/experimental_log/src"
-            "${NRF5_SDK_PATH}/components/libraries/experimental_memobj"
-            "${NRF5_SDK_PATH}/components/libraries/balloc"
-            "${NRF5_SDK_PATH}/components/libraries/strerror"
-    )
 
     # adds target for erasing and flashing the board with a softdevice
     add_custom_target(FLASH_SOFTDEVICE ALL
@@ -224,10 +212,31 @@ macro(nRF5x_addExecutable EXECUTABLE_NAME SOURCE_FILES)
 endmacro()
 
 
+
+# Macros for sets of sources by capability
+# E.g. RTT is optional
+
+# adds NRF_LOG
+# sdk_config.h>NRF_LOG_ENABLED
+
+macro(nRF5x_addNRF_LOG)
+    include_directories(
+            "${NRF5_SDK_PATH}/components/libraries/log/src/"
+    )
+    
+    list(APPEND SDK_SOURCE_FILES
+            "${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_backend_serial.c"
+            "${NRF5_SDK_PATH}/components/libraries/log/src/nrf_log_frontend.c"
+            )
+
+endmacro(nRF5x_addNRF_LOG)
+
+
 # adds Segger RTT
+# sdk_config.h>NRF_LOG_BACKEND_RTT_ENABLED
 macro(nRF5x_addRTT)
     include_directories(
-            "${NRF5_SDK_PATH}/components/libraries/scheduler"
+            "${NRF5_SDK_PATH}/external/segger_rtt"
     )
     
     list(APPEND SDK_SOURCE_FILES
