@@ -71,12 +71,13 @@ ENDIF()
 
 # build test harness that calls the lib
 
-# I don't call nRF5x_addExecutable(testLibBLEProvisionee main2.cpp)
-# but 
+# This has the same effect as a raw call to add_executable()
+# but also defines a flash target
+nRF5x_addExecutable(testLibBLEProvisionee main.cpp)
 
-#this does not link in SDK files
-# because SDK_SOURCE_FILES is local to macro ???
-add_executable(testLibBLEProvisionee "" )
+# Alternatively you can use this
+# but also uncomment the later target_sources(testLibBLEProvisionee ...
+#add_executable(testLibBLEProvisionee "" )
 
 
 # test harness links
@@ -144,9 +145,9 @@ target_sources(BLEProvisionee
 # a main which calls the library
 # and SDK sources to satisfy calls from the library
 # choose main.cpp or main2.cpp (minimal)
-target_sources(testLibBLEProvisionee
-   PUBLIC
-       "${CMAKE_CURRENT_LIST_DIR}/main.cpp"
-       "${SDK_SOURCE_FILES}"
-   )
+#target_sources(testLibBLEProvisionee
+#   PUBLIC
+#       "${CMAKE_CURRENT_LIST_DIR}/main.cpp"
+#       "${SDK_SOURCE_FILES}"
+#   )
  
