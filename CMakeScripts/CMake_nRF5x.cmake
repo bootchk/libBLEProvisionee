@@ -1,3 +1,10 @@
+
+# lloyd konneker
+# Derived from Polidea's github repository cmake-nRF5x
+# Changed: include a cmake script to patch for v14.2
+
+
+
 cmake_minimum_required(VERSION 3.5.1)
 
 # check if all the necessary toolchain SDK and tools paths have been provided.
@@ -90,13 +97,14 @@ macro(nRF5x_setup)
     set(CMAKE_ASM_FLAGS "-MP -MD -std=c99 -x assembler-with-cpp")
     set(CMAKE_EXE_LINKER_FLAGS "-mthumb -mabi=aapcs -std=gnu++98 -std=c99 -L ${NRF5_SDK_PATH}/components/toolchain/gcc -T${NRF5_LINKER_SCRIPT} ${CPU_FLAGS} -Wl,--gc-sections --specs=nano.specs -lc -lnosys -lm")
     # note: we must override the default cmake linker flags so that CMAKE_C_FLAGS are not added implicitly
+    # lkk: added LINK_LIBRARIES
     set(CMAKE_C_LINK_EXECUTABLE "${CMAKE_C_COMPILER} <LINK_FLAGS> <OBJECTS> -o <TARGET>")
-    set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_C_COMPILER} <LINK_FLAGS> <OBJECTS> -lstdc++ -o <TARGET>")
+    set(CMAKE_CXX_LINK_EXECUTABLE "${CMAKE_C_COMPILER} <LINK_FLAGS> <OBJECTS> -lstdc++ -o <TARGET> <LINK_LIBRARIES>")
 
     include_directories(".")
     
     # SDK version specific headers and sources
-    include("CMake_nRF5x_v14_2.cmake")
+    include("CMake_nRF5x_v14_2")
 
     # basic board definitions and drivers
     include_directories(

@@ -36,6 +36,7 @@
  # source files new to 14.2 ?
  list(APPEND SDK_SOURCE_FILES
        "${NRF5_SDK_SD_COMMON}/nrf_sdh_ble.c"
+       "${NRF5_SDK_BLE_GATT}/nrf_ble_gatt.c"
  )
  
  # some headers have moved to /ble ?

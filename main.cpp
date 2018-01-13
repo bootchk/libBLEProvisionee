@@ -59,5 +59,7 @@ int main(void)
 
 		NRFLog::log("Sleeping between provisionings.");
 		sleepUntilNextProvisioningSession();
+
+		// Instead of sleeping, your app does other work, or uses radio for another protocol
 	}
 }
