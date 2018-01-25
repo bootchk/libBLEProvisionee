@@ -53,13 +53,14 @@ Most of the sources for the library are in the objects directory.
 Those are facade classes, from the library to Nordic SDK functions.
 
 All the other sources (e.g. main.cpp) are for the executable target, the test harness app.
-Other sources for the test harness (the Nordic functions) are specified in CMake_nRF5x.cmake.
+Other sources for the test harness (the Nordic functions) are specified by calls to macros in nRFCmake.
 That includes the startup files, and other files used by the library.
 The library itself does not contain any code from Nordic, the app must contain them.
 
 The executable target also depends on the .ld loader script
 
 Both the library and the executable are configured by sdk_config.h (a Nordic construct.)
+Some of the macros used in the library are configured by sdk_config.h???
 
 Test harness app
 -
@@ -73,20 +74,25 @@ Use this to test the build process.
 Dependencies
 -
 
+Building depends on scripts from nRF5Cmake repository
+
 The library depends on other static libraries:
 
-    - https://github.com/bootchk/radioSoC
+    - https://github.com/bootchk/radioSoCSD (the SD compatible build)
     
 which in turn depends on
 
     - https://github.com/bootchk/nRF5x
     - https://github.com/bootchk/embeddedMath
+    - https://github.com/bootchk/libNRFDrivers
     
 The library sources only include headers from the first.
 
 All libraries must be made with the same float API (usually hard, for nrf52xxx family.)
 
-Unfortunately, the other libraries don't have cmake scripts yet.
+Unfortunately, not all the other libraries have cmake scripts yet.
+
+The test harness depends on sources from nRFSDK, the .ld script, and sdk_config.h
 
 
 Building

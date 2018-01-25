@@ -8,7 +8,7 @@ project(BLEProvisionee C CXX ASM)
 
 # cmake includes modules from here
 # !!! only for simple names without the .cmake suffix
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/CMakeScripts/")
+set(CMAKE_MODULE_PATH "/home/bootch/git/nRF5Cmake/")
 message("${CMAKE_MODULE_PATH}")
 
 
@@ -18,14 +18,21 @@ include("CMakeEnv")
 
 # set var that configures CMake_nRF5x
 set(NRF_TARGET "nrf52")
+set(NRF_SOFTDEVICE "s132")
 
 
 # scripts specific to nRF5x building
 # Defines cmake macros prefixed with "nRF5x"
 # Sets many cmake vars for tool flags
-include("CMake_nRF5x")
+include("nRF5")
 
-nRF5x_setup()
+nRF5CheckSetupPreconditions()
+nRF5SetBuildOptions()
+nRF5SetIncludePaths()
+nRF5SetSDKSourcesBasic()
+
+# Also BLE
+nRF5SDKSourcesBLE()
 
 
 
@@ -38,14 +45,23 @@ add_library(BLEProvisionee "" )
 
 
 # import libs from outside project
+
+# libBLEProvisionee includes headers from library radioSoC52
 add_library(radioSoC52 STATIC IMPORTED)
-set_target_properties( radioSoC52 PROPERTIES IMPORTED_LOCATION /home/bootch/git/radioSoC/Debug52/libradioSoC52.a )
+set_target_properties( radioSoC52 
+    PROPERTIES 
+        IMPORTED_LOCATION /home/bootch/git/radioSoC/Debug52/libradioSoC52.a
+        INTERFACE_INCLUDE_DIRECTORIES "/home/bootch/git/radioSoC/src/clock"
+    )
 
 add_library(nRF5x STATIC IMPORTED)
 set_target_properties( nRF5x PROPERTIES IMPORTED_LOCATION /home/bootch/git/nRF5x/DebugnRF52/libnRF5x52.a )
 
 add_library(embeddedMath STATIC IMPORTED)
 set_target_properties( embeddedMath PROPERTIES IMPORTED_LOCATION /home/bootch/git/embeddedMath/Debug52/libembeddedMath52.a )
+
+add_library(NRFDrivers STATIC IMPORTED)
+set_target_properties( NRFDrivers PROPERTIES IMPORTED_LOCATION /home/bootch/git/libNRFDrivers/Debug/libNRFDrivers.a )
 
 
 
@@ -69,18 +85,10 @@ ENDIF()
 
 
 
-# build test harness that calls the lib
+# test harness that calls the lib
+# source declared later
+add_executable(testLibBLEProvisionee "")
 
-# This has the same effect as a raw call to add_executable()
-# but also defines a flash target
-nRF5x_addExecutable(testLibBLEProvisionee main.cpp)
-
-# Alternatively you can use this
-# but also uncomment the later target_sources(testLibBLEProvisionee ...
-#add_executable(testLibBLEProvisionee "" )
-
-
-# test harness links
 
 # harness links target library (using a logical name, from preceding add_library()
 # the library built by this project
@@ -91,17 +99,15 @@ PRIVATE
     radioSoC52
     nRF5x
     embeddedMath
+    NRFDrivers
     )
 
-# link to a IMPORTED library
-#target_link_libraries(testLibBLEProvisionee 
-#    ${CMAKE_CURRENT_LIST_DIR}/libBLEProvisionee.a
-#    )
-
+# TODO radioSoC52SD
 
 
 # lib uses C++ facades to SDK
 # AND radioSoC lib
+# TODO why doesn't the above declaration for radioSoC make the headers available?
 target_include_directories(BLEProvisionee
    PUBLIC
        "${CMAKE_CURRENT_LIST_DIR}"
@@ -109,13 +115,8 @@ target_include_directories(BLEProvisionee
        "/home/bootch/git/radioSoC/src/clock"
        )
      
-# test harness includes headers of library
-target_include_directories(testLibBLEProvisionee
-   PUBLIC
-       "${CMAKE_CURRENT_LIST_DIR}/objects"  
-    )
        
-# message("${SDK_SOURCE_FILES}")
+# message("${SDK_SOURCES}")
 
 # sources for lib are just the facade classes
 # Not the SDK_SOURCE_FILES they call.
@@ -145,9 +146,12 @@ target_sources(BLEProvisionee
 # a main which calls the library
 # and SDK sources to satisfy calls from the library
 # choose main.cpp or main2.cpp (minimal)
-#target_sources(testLibBLEProvisionee
-#   PUBLIC
-#       "${CMAKE_CURRENT_LIST_DIR}/main.cpp"
-#       "${SDK_SOURCE_FILES}"
-#   )
+target_sources(testLibBLEProvisionee
+   PUBLIC
+       "${CMAKE_CURRENT_LIST_DIR}/main.cpp"
+       "${SDK_SOURCES}"
+   )
  
+ 
+#nRF5GenerateOtherArtifacts(testLibBLEProvisionee)
+#nRF5AddCustomTargets(testLibBLEProvisionee)
