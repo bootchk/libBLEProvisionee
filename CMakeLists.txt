@@ -153,5 +153,5 @@ target_sources(testLibBLEProvisionee
    )
  
  
-#nRF5GenerateOtherArtifacts(testLibBLEProvisionee)
-#nRF5AddCustomTargets(testLibBLEProvisionee)
+nRF5GenerateOtherArtifacts(testLibBLEProvisionee)
+nRF5AddCustomTargets(testLibBLEProvisionee)
