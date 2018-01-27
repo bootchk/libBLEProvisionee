@@ -1,6 +1,4 @@
 
-#
-
 cmake_minimum_required(VERSION 3.5.1)
 
 project(BLEProvisionee C CXX ASM)
@@ -22,7 +20,7 @@ set(NRF_SOFTDEVICE "s132")
 
 
 # scripts specific to nRF5x building
-# Defines cmake macros prefixed with "nRF5x"
+# Defines cmake macros prefixed with "nRF5"
 # Sets many cmake vars for tool flags
 include("nRF5")
 
