@@ -32,6 +32,9 @@ nRF5SetSDKSourcesBasic()
 # Also BLE
 nRF5SDKSourcesBLE()
 
+# define sources needed startup an executable (the test harness)
+nRF5SDKSourcesStartup()
+
 
 
 # build lib
@@ -110,7 +113,7 @@ target_include_directories(BLEProvisionee
        )
      
        
-# message("${SDK_SOURCES}")
+
 
 # sources for lib are just the facade classes
 # !!! And the SDK_SOURCE_FILES they call (so that the app (exe) does not need to link them)
@@ -150,3 +153,9 @@ target_sources(testLibBLEProvisionee
  
 nRF5GenerateOtherArtifacts(testLibBLEProvisionee)
 nRF5AddCustomTargets(testLibBLEProvisionee)
+
+message("SDK_SOURCES:  ${SDK_SOURCES}")
+message("SDK_SOURCES_STARTUP: ${SDK_SOURCES_STARTUP}")
+
+
+

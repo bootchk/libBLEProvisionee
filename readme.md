@@ -51,6 +51,7 @@ See CMakeLists.txt, which documents the built artifacts, their sources, and thei
 
 Most of the sources for the library are in the objects directory.
 Those are facade classes, from the library to Nordic SDK functions.
+(Objects directory is a link another repository multiProtocolNordic, until I unify the two repositories.)
 
 All the other sources (e.g. main.cpp) are for the executable target, the test harness app.
 Other sources for the test harness (the Nordic functions) are specified by calls to macros in nRFCmake.
@@ -95,17 +96,34 @@ Unfortunately, not all the other libraries have cmake scripts yet.
 The test harness depends on sources from nRFSDK, the .ld script, and sdk_config.h
 
 
+Configuring the SDK
+-
+
+See sdk_config.h.
+
+A loose discussion of what I might have changed follows.  This depends on the SDK version and it's default sdk_config.h
+
+NRF_SDH_ENABLED 1		using Softdevice
+NRF_SDH_BLE_ENABLED 1   using BLE stack on Softdevice
+NRF_BLE_GATT_ENABLED 1  using GATT module (to handle GATT events for us)
+CLOCK_ENABLED 1         using the SD compatible LF/HF clock module
+
+APP_TIMER_ENABLED 0        not using, instead implementing timers ourselves
+BLE_ADVERTISING_ENABLED 0  not using advertising module, instead implementing only one fast advertising
+
+
 Building
 -
 
 Uses CMake and a command line.
 
-First edit CMakeEnv.cmake.
+First edit CMakeEnv.cmake (in your clone of nRF5Cmake repository)
 
 Then
 
-    cmake -H. -B"cmake-build" -G "Unix Makefiles"
-    cmake --build "cmake-build" --target testLibBLEProvisionee
+    mkdir Debug52   ( or another name)
+    cmake -H. -B"Debug52" -G "Unix Makefiles"    (or "Ninja")
+    cmake --build "Debug52" --target testLibBLEProvisionee
 
 The former creates the build directory and Makefiles.
 The latter builds.
@@ -119,6 +137,7 @@ To burn to a NRF52DK dev board:
     cmake --build "cmake-build" --target FLASH_testLibBLEProvisionee
     
 The app will start running on the DK, and periodically advertise its "provisioning" service.
+In very short bursts (2mSec) which you might need to change.
 
 Testing
 -
@@ -157,9 +176,3 @@ TODO
 
     test multiprotocol, i.e. that the app can use the radio for other things while not provisioning, without conflicting with provisioning 
     
-Acknowledgements
--
-
-Several cmake scripts come from https://github.com/Polidea/cmake-nRF5x
-
-I modified them for SDK v14.2, and to allow imported libraries.
