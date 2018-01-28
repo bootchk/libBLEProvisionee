@@ -48,12 +48,12 @@ add_library(BLEProvisionee "" )
 add_library(radioSoC52 STATIC IMPORTED)
 set_target_properties( radioSoC52 
     PROPERTIES 
-        IMPORTED_LOCATION /home/bootch/git/radioSoC/Debug52/libradioSoC52.a
-        INTERFACE_INCLUDE_DIRECTORIES "/home/bootch/git/radioSoC/src/clock"
+        IMPORTED_LOCATION /home/bootch/git/radioSoC/Debug52wSD/libradioSoC52wSD.a
+        INTERFACE_INCLUDE_DIRECTORIES "/home/bootch/git/radioSoC/src/"
     )
 
 add_library(nRF5x STATIC IMPORTED)
-set_target_properties( nRF5x PROPERTIES IMPORTED_LOCATION /home/bootch/git/nRF5x/DebugnRF52/libnRF5x52.a )
+set_target_properties( nRF5x PROPERTIES IMPORTED_LOCATION /home/bootch/git/nRF5x/Debug52/libnRF5x52.a )
 
 add_library(embeddedMath STATIC IMPORTED)
 set_target_properties( embeddedMath PROPERTIES IMPORTED_LOCATION /home/bootch/git/embeddedMath/Debug52/libembeddedMath52.a )
@@ -68,7 +68,7 @@ else()
     message("FATAL_ERROR libradioSoC52.a not exist")
 ENDIF()
 
-IF(EXISTS /home/bootch/git/nRF5x/DebugnRF52/libnRF5x52.a )
+IF(EXISTS /home/bootch/git/nRF5x/Debug52/libnRF5x52.a )
 else()
     message("FATAL_ERROR libnRF5x52.a not exist")
 ENDIF()
@@ -77,10 +77,6 @@ IF(EXISTS /home/bootch/git/embeddedMath/Debug52/libembeddedMath52.a)
 else()
     message("FATAL_ERROR libembeddedMath52.a not exist")
 ENDIF()
-
-
-#if(TARGET radioSoC52)
-
 
 
 # test harness that calls the lib
@@ -110,14 +106,14 @@ target_include_directories(BLEProvisionee
    PUBLIC
        "${CMAKE_CURRENT_LIST_DIR}"
        "${CMAKE_CURRENT_LIST_DIR}/objects"
-       "/home/bootch/git/radioSoC/src/clock"
+       "/home/bootch/git/radioSoC/src"
        )
      
        
 # message("${SDK_SOURCES}")
 
 # sources for lib are just the facade classes
-# Not the SDK_SOURCE_FILES they call.
+# !!! And the SDK_SOURCE_FILES they call (so that the app (exe) does not need to link them)
 target_sources(BLEProvisionee
    PUBLIC
        "${CMAKE_CURRENT_LIST_DIR}/objects/softdevice.cpp"
@@ -137,17 +133,18 @@ target_sources(BLEProvisionee
        "${CMAKE_CURRENT_LIST_DIR}/objects/service.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/characteristic.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/uuid.cpp"
+       "${SDK_SOURCES}"
    )
    
    
 # sources of test harness
 # a main which calls the library
-# and SDK sources to satisfy calls from the library
+# and SDK sources that startup the app
 # choose main.cpp or main2.cpp (minimal)
 target_sources(testLibBLEProvisionee
    PUBLIC
        "${CMAKE_CURRENT_LIST_DIR}/main.cpp"
-       "${SDK_SOURCES}"
+       "${SDK_SOURCES_STARTUP}"
    )
  
  

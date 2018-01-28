@@ -10,7 +10,7 @@
 #include "softdevice.h"
 
 // radioSoc
-#include "sleeper.h"
+#include "clock/sleeper.h"
 
 
 void provisioningFailedCallback() {
