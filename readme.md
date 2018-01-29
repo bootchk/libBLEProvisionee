@@ -103,13 +103,20 @@ See sdk_config.h.
 
 A loose discussion of what I might have changed follows.  This depends on the SDK version and it's default sdk_config.h
 
-NRF_SDH_ENABLED 1		using Softdevice
-NRF_SDH_BLE_ENABLED 1   using BLE stack on Softdevice
-NRF_BLE_GATT_ENABLED 1  using GATT module (to handle GATT events for us)
-CLOCK_ENABLED 1         using the SD compatible LF/HF clock module
+    # Mandatory
+    NRF_SDH_ENABLED 1		using Softdevice
+    NRF_SDH_BLE_ENABLED 1   using BLE stack on Softdevice
+    NRF_BLE_GATT_ENABLED 1  using GATT module (to handle GATT events for us)
+    CLOCK_ENABLED 1         using the SD compatible LF/HF clock module
 
-APP_TIMER_ENABLED 0        not using, instead implementing timers ourselves
-BLE_ADVERTISING_ENABLED 0  not using advertising module, instead implementing only one fast advertising
+    # Not used
+    APP_TIMER_ENABLED 0        not using, instead implementing timers ourselves
+    BLE_ADVERTISING_ENABLED 0  not using advertising module,
+                  instead implementing only one fast advertising
+                  
+    # Optional, requires more sources linked into app              
+    NRF_LOG_ENABLED 0
+    NRF_LOG_BACKEND_RTT_ENABLED 0
 
 
 Building
@@ -126,7 +133,9 @@ Then
     cmake --build "Debug52" --target testLibBLEProvisionee
 
 The former creates the build directory and Makefiles.
-The latter builds.
+The latter builds the test harness.
+Since the test harness depends on the library, it builds the library first.
+If you don't want the test harness:  --target BLEProvisionee
 
 At least once burn the Softdevice (a layer implementing BT) to a separate area of ROM:
 
