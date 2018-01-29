@@ -139,11 +139,11 @@ If you don't want the test harness:  --target BLEProvisionee
 
 At least once burn the Softdevice (a layer implementing BT) to a separate area of ROM:
 
-    cmake --build "cmake-build" --target FLASH_SOFTDEVICE
+    cmake --build "Debug52" --target FLASH_SOFTDEVICE
     
 To burn to a NRF52DK dev board:
 
-    cmake --build "cmake-build" --target FLASH_testLibBLEProvisionee
+    cmake --build "Debug52" --target FLASH_testLibBLEProvisionee
     
 The app will start running on the DK, and periodically advertise its "provisioning" service.
 In very short bursts (2mSec) which you might need to change.
