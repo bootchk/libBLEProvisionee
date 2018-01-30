@@ -18,9 +18,8 @@ void provisioningFailedCallback() {
 }
 
 
-void provisioningSuccededCallback() {
-	// TODO pass the provisioned value
-	//NRFLog::log("provision succeed");
+void provisioningSuccededCallback(uint8_t provisionedValue) {
+	NRFLog::log("provision succeed");
 }
 
 
