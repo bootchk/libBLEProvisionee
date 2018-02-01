@@ -18,7 +18,9 @@ void provisioningFailedCallback() {
 }
 
 
-void provisioningSuccededCallback(uint8_t provisionedValue) {
+void provisioningSuccededCallback(
+		uint8_t provisionedValue,
+		int8_t rssi) {
 	NRFLog::log("provision succeed");
 }
 
