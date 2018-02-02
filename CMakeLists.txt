@@ -136,6 +136,7 @@ target_sources(BLEProvisionee
        "${CMAKE_CURRENT_LIST_DIR}/objects/service.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/characteristic.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/uuid.cpp"
+       "${CMAKE_CURRENT_LIST_DIR}/objects/rssi.cpp"
        "${SDK_SOURCES}"
    )
    
