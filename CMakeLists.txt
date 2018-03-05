@@ -27,10 +27,12 @@ include("nRF5")
 nRF5CheckSetupPreconditions()
 nRF5SetBuildOptions()
 nRF5SetIncludePaths()
-nRF5SetSDKSourcesBasic()
 
+
+nRF5SetSDKSourcesBasic()
 # Also BLE
 nRF5SDKSourcesBLE()
+# SDK_SOURCES is now a list of SDK source files called by library and archived in library
 
 # define sources needed startup an executable (the test harness)
 nRF5SDKSourcesStartup()
@@ -48,8 +50,8 @@ add_library(BLEProvisionee "" )
 # import libs from outside project
 
 # libBLEProvisionee includes headers from library radioSoC52
-add_library(radioSoC52 STATIC IMPORTED)
-set_target_properties( radioSoC52 
+add_library(radioSoC52wSD STATIC IMPORTED)
+set_target_properties( radioSoC52wSD
     PROPERTIES 
         IMPORTED_LOCATION /home/bootch/git/radioSoC/Debug52wSD/libradioSoC52wSD.a
         INTERFACE_INCLUDE_DIRECTORIES "/home/bootch/git/radioSoC/src/"
@@ -66,7 +68,7 @@ set_target_properties( NRFDrivers PROPERTIES IMPORTED_LOCATION /home/bootch/git/
 
 
 
-IF(EXISTS /home/bootch/git/radioSoC/Debug52/libradioSoC52.a)
+IF(EXISTS /home/bootch/git/radioSoC/Debug52wSD/libradioSoC52wSD.a)
 else()
     message("FATAL_ERROR libradioSoC52.a not exist")
 ENDIF()
@@ -93,13 +95,11 @@ add_executable(testLibBLEProvisionee "")
 target_link_libraries(testLibBLEProvisionee 
 PRIVATE
     BLEProvisionee
-    radioSoC52
+    radioSoC52wSD
     nRF5x
     embeddedMath
     NRFDrivers
     )
-
-# TODO radioSoC52SD
 
 
 # lib uses C++ facades to SDK

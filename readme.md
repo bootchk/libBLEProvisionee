@@ -128,9 +128,9 @@ First edit CMakeEnv.cmake (in your clone of nRF5Cmake repository)
 
 Then
 
-    mkdir Debug52   ( or another name)
-    cmake -H. -B"Debug52" -G "Unix Makefiles"    (or "Ninja")
-    cmake --build "Debug52" --target testLibBLEProvisionee
+    mkdir Debug   ( or another name)
+    cmake -H. -B"Debug" -G "Ninja"    ( or "Unix Makefiles")
+    cmake --build "Debug" --target testLibBLEProvisionee
 
 The former creates the build directory and Makefiles.
 The latter builds the test harness.
