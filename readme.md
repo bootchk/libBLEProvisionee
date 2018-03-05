@@ -1,5 +1,6 @@
 libBLEProvisionee
 
+A library that lets an app be provisioned (configured) using Bluetooth LE from a client app.
 
 Attributes
 -
@@ -51,12 +52,14 @@ See CMakeLists.txt, which documents the built artifacts, their sources, and thei
 
 Most of the sources for the library are in the objects directory.
 Those are facade classes, from the library to Nordic SDK functions.
-(Objects directory is a link another repository multiProtocolNordic, until I unify the two repositories.)
 
 All the other sources (e.g. main.cpp) are for the executable target, the test harness app.
 Other sources for the test harness (the Nordic functions) are specified by calls to macros in nRFCmake.
-That includes the startup files, and other files used by the library.
-The library itself does not contain any code from Nordic, the app must contain them.
+That includes the startup files (See SDK_SOURCES_STARTUP in cmake scripts.)
+
+The built library (archive) itself DOES contain sources from Nordic SDK.
+But only those SDK sources called by the facade objects of the library(See SDK_SOURCES in cmake scripts.)
+The sources are not IN the repository; the cmake scripts reference the original, unmodified sources from the SDK. 
 
 The executable target also depends on the .ld loader script
 
@@ -79,7 +82,7 @@ Building depends on scripts from nRF5Cmake repository
 
 The library depends on other static libraries:
 
-    - https://github.com/bootchk/radioSoCSD (the SD compatible build)
+    - https://github.com/bootchk/radioSoCwSD (the SD compatible build)
     
 which in turn depends on
 
@@ -180,8 +183,13 @@ You might try generating a proper Eclipse project using:
     https://cmake.org/Wiki/Eclipse_CDT4_Generator
     
 
-TODO
+Status
 -
 
-    test multiprotocol, i.e. that the app can use the radio for other things while not provisioning, without conflicting with provisioning 
+I am using it in my app SolarRadioFirefly.  It seems to work, but testing has been light.  Seems to work means:  it does sequential multiprotocol, i.e. the the app uses the radio with BT protocol during provisioning, and uses the radio with another protocol while not provisioning, without conflicts.
+
+Logging
+-
+
+The library facade uses a NRFLog facade.  I'm not quite sure why it logs while the SDK sources do not log.  IOW I am not quite sure how logging configuration in sdk_config.h works.
     
