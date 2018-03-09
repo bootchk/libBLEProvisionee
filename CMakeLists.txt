@@ -15,8 +15,13 @@ message("${CMAKE_MODULE_PATH}")
 include("CMakeEnv")
 
 # set var that configures CMake_nRF5x
-set(NRF_TARGET "nrf52")
-set(NRF_SOFTDEVICE "s132")
+set(NRF_FAMILY "nrf52")
+
+#set(CHIP "nrf52832")
+#set(SOFTDEVICE "s132")
+
+set(CHIP "nrf52810")
+set(SOFTDEVICE "s112")
 
 
 # scripts specific to nRF5x building
@@ -27,8 +32,7 @@ include("nRF5")
 nRF5CheckSetupPreconditions()
 
 # Must set linker script before build options
-# Broken for my use
-# nRF5SetSoftdeviceLinkerScript(NRF5_LINKER_SCRIPT "s132")
+# Broken for my use:  nRF5SetSoftdeviceLinkerScript(NRF5_LINKER_SCRIPT "s132")
 set(NRF5_LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/gcc_nrf52.ld")
 
 nRF5SetBuildOptions()
@@ -51,32 +55,30 @@ nRF5SDKSourcesStartup()
 # note sources specified later
 add_library(BLEProvisionee "" )
 
-nRF5SetSoftdeviceIncludePaths( "BLEProvisionee" "s132")
-nRF5SetSoftdeviceDefinitions( "BLEProvisionee" "s132")
-nRF5SetChipCompileDefinitions( "BLEProvisionee" "nrf52832")
+nRF5SetSoftdeviceIncludePaths( "BLEProvisionee" ${SOFTDEVICE})
+nRF5SetSoftdeviceDefinitions( "BLEProvisionee" ${SOFTDEVICE})
+nRF5SetChipCompileDefinitions( "BLEProvisionee" ${CHIP})
 
 # used only by custom target FLASH_SOFTDEVICE
 # TODO use it for more customer targets, one per SD 
-nRF5SetSoftdevicePaths(SOFTDEVICE_PATH "s132")
-
-#currently used in # TODO use this in targets
-nRF5SetSoftdeviceLinkerScript(LINKER_SCRIPT "s132")
+nRF5SetSoftdevicePaths(SOFTDEVICE_PATH ${SOFTDEVICE})
 
 # import libs from outside project
 
 # libBLEProvisionee includes headers from library radioSoC52
+# WAS Debug52wSD
 add_library(radioSoC52wSD STATIC IMPORTED)
 set_target_properties( radioSoC52wSD
     PROPERTIES 
-        IMPORTED_LOCATION /home/bootch/git/radioSoC/Debug52wSD/libradioSoC52wSD.a
+        IMPORTED_LOCATION /home/bootch/git/radioSoC/Release52/libradioSoC52wSD.a
         INTERFACE_INCLUDE_DIRECTORIES "/home/bootch/git/radioSoC/src/"
     )
 
 add_library(nRF5x STATIC IMPORTED)
-set_target_properties( nRF5x PROPERTIES IMPORTED_LOCATION /home/bootch/git/nRF5x/Debug52/libnRF5x52.a )
+set_target_properties( nRF5x PROPERTIES IMPORTED_LOCATION /home/bootch/git/nRF5x/Release52/libnRF5x52.a )
 
 add_library(embeddedMath STATIC IMPORTED)
-set_target_properties( embeddedMath PROPERTIES IMPORTED_LOCATION /home/bootch/git/embeddedMath/Debug52/libembeddedMath52.a )
+set_target_properties( embeddedMath PROPERTIES IMPORTED_LOCATION /home/bootch/git/embeddedMath/Release52/libembeddedMath52.a )
 
 add_library(NRFDrivers STATIC IMPORTED)
 set_target_properties( NRFDrivers PROPERTIES IMPORTED_LOCATION /home/bootch/git/libNRFDrivers/Debug/libNRFDrivers.a )
@@ -104,9 +106,9 @@ ENDIF()
 add_executable(testLibBLEProvisionee "")
 
 # executable target for same chip and softdevice
-nRF5SetSoftdeviceIncludePaths( "testLibBLEProvisionee" "s132")
-nRF5SetSoftdeviceDefinitions( "testLibBLEProvisionee" "s132")
-nRF5SetChipCompileDefinitions( "testLibBLEProvisionee" "nrf52832")
+nRF5SetSoftdeviceIncludePaths( "testLibBLEProvisionee" ${SOFTDEVICE})
+nRF5SetSoftdeviceDefinitions( "testLibBLEProvisionee" ${SOFTDEVICE})
+nRF5SetChipCompileDefinitions( "testLibBLEProvisionee" ${CHIP})
 
 
 
