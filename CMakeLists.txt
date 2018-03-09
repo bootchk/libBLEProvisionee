@@ -25,6 +25,12 @@ set(NRF_SOFTDEVICE "s132")
 include("nRF5")
 
 nRF5CheckSetupPreconditions()
+
+# Must set linker script before build options
+# Broken for my use
+# nRF5SetSoftdeviceLinkerScript(NRF5_LINKER_SCRIPT "s132")
+set(NRF5_LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/gcc_nrf52.ld")
+
 nRF5SetBuildOptions()
 nRF5SetIncludePaths()
 
@@ -45,7 +51,16 @@ nRF5SDKSourcesStartup()
 # note sources specified later
 add_library(BLEProvisionee "" )
 
+nRF5SetSoftdeviceIncludePaths( "BLEProvisionee" "s132")
+nRF5SetSoftdeviceDefinitions( "BLEProvisionee" "s132")
+nRF5SetChipCompileDefinitions( "BLEProvisionee" "nrf52832")
 
+# used only by custom target FLASH_SOFTDEVICE
+# TODO use it for more customer targets, one per SD 
+nRF5SetSoftdevicePaths(SOFTDEVICE_PATH "s132")
+
+#currently used in # TODO use this in targets
+nRF5SetSoftdeviceLinkerScript(LINKER_SCRIPT "s132")
 
 # import libs from outside project
 
@@ -88,6 +103,12 @@ ENDIF()
 # source declared later
 add_executable(testLibBLEProvisionee "")
 
+# executable target for same chip and softdevice
+nRF5SetSoftdeviceIncludePaths( "testLibBLEProvisionee" "s132")
+nRF5SetSoftdeviceDefinitions( "testLibBLEProvisionee" "s132")
+nRF5SetChipCompileDefinitions( "testLibBLEProvisionee" "nrf52832")
+
+
 
 # harness links target library (using a logical name, from preceding add_library()
 # the library built by this project
@@ -111,14 +132,9 @@ target_include_directories(BLEProvisionee
        "${CMAKE_CURRENT_LIST_DIR}/objects"
        "/home/bootch/git/radioSoC/src"
        )
-     
-       
-
-
-# sources for lib are just the facade classes
-# !!! And the SDK_SOURCE_FILES they call (so that the app (exe) does not need to link them)
-target_sources(BLEProvisionee
-   PUBLIC
+ 
+ 
+ list(APPEND FacadeSources
        "${CMAKE_CURRENT_LIST_DIR}/objects/softdevice.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/softdeviceHandler.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/softdeviceSleeper.cpp"
@@ -137,6 +153,15 @@ target_sources(BLEProvisionee
        "${CMAKE_CURRENT_LIST_DIR}/objects/characteristic.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/uuid.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/rssi.cpp"
+       )
+ 
+
+
+# sources for lib are just the facade classes
+# !!! And the SDK_SOURCE_FILES they call (so that the app (exe) does not need to link them)
+target_sources(BLEProvisionee
+   PUBLIC
+       "${FacadeSources}"
        "${SDK_SOURCES}"
    )
    
