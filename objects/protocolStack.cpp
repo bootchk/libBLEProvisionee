@@ -8,15 +8,18 @@
 
 
 
-bool ProtocolStack::startup() {
+ProvisioningResult ProtocolStack::startup() {
 
-	if ( ! Softdevice::enable() ) return false;
+	ProvisioningResult enableSDResult;
+	enableSDResult = Softdevice::enable();
+	if ( enableSDResult != ProvisioningResult::SDEnabledSuccessfully  ) return enableSDResult;
 
 	BLEProtocol::start();
 
 	BLEProtocol::startAdvertising();
 
-	return true;
+	// We don't have results for start() and startAd()
+	return enableSDResult;
 }
 
 

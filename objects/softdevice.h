@@ -5,13 +5,14 @@
 #include "nrf_sdh.h"
 #include "nrf_sdh_ble.h"	// ble_evt_t
 
+#include "provisioner.h"
 
 class Softdevice {
 	// Some sort of label for protocol???
 	static const int ProtocolTag = 1;
 
 public:
-	static bool enable();
+	static ProvisioningResult enable();
 	static bool isEnabled();
 	static void disable();
 

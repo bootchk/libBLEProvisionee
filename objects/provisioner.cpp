@@ -60,7 +60,7 @@ void Provisioner::init(ProvisioningSucceedCallback aSucceedCallback, Provisionin
  * start() and shutdown() should be mirror images
  */
 
-bool Provisioner::start() {
+ProvisioningResult Provisioner::start() {
 	NRFLog::log("Provisioner start");
 
 	// provisioning sessions are one at a time
@@ -69,13 +69,12 @@ bool Provisioner::start() {
 	// assert self initialized
 	assert(succeedCallback != nullptr);
 
-	if ( ! ProtocolStack::startup() ) {
-		return false;
-	}
-	else {
+	ProvisioningResult startResult;
+	startResult = ProtocolStack::startup();
+	if ( startResult == ProvisioningResult::SDStartedSuccessfully  ) {
 		isProvisioningFlag = true;
-		return true;
 	}
+	return startResult;
 }
 
 void Provisioner::shutdown() {
@@ -196,9 +195,12 @@ ProvisioningResult Provisioner::provisionWithSleep() {
 	// Clear flag before starting session, it may succeed before we get to sleep
 	SoftdeviceSleeper::setReasonForSDWake(ReasonForSDWake::Cleared);
 
-	if ( ! start() ) {
+
+	ProvisioningResult startResult;
+	startResult = start();
+	if ( startResult != ProvisioningResult::SDStartedSuccessfully ) {
 		NRFLog::log("Provisioner unable to start");
-		result = ProvisioningResult::SDError;
+		result = startResult;
 	}
 	else {
 		NRFLog::log("Provisioner sleeps");

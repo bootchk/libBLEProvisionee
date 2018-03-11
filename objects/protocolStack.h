@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "provisioner.h"
+
 
 /*
  * A stack of layers for communication.
@@ -14,7 +16,7 @@
 class ProtocolStack {
 public:
 	// returns false if fails
-	static bool startup();
+	static ProvisioningResult startup();
 
 	static void shutdown();
 

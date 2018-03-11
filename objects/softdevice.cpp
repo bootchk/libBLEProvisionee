@@ -3,6 +3,7 @@
 
 #include <inttypes.h>
 
+
 // #include "app_error.h"	// APP_ERROR_CHECK
 
 
@@ -42,7 +43,7 @@
 
 
 
-bool Softdevice::enable() {
+ProvisioningResult Softdevice::enable() {
 	uint32_t           err_code;
 
 	// NRFLog::log("Enable SD\n");
@@ -92,7 +93,7 @@ bool Softdevice::enable() {
 	NRFLog::flush();
 #else
 	err_code = nrf_sdh_enable_request();
-	returnFalseOnSDError();
+	if (err_code != NRF_SUCCESS) { return ProvisioningResult::SDErrorOnSDEnable ; }
 
 	ASSERT(nrf_sdh_is_enabled());
 
@@ -116,11 +117,11 @@ bool Softdevice::enable() {
 	 * run through debugger, then change .ld file.
 	 */
 	err_code = nrf_sdh_ble_default_cfg_set(Softdevice::ProtocolTag, &ram_start);
-	returnFalseOnSDError();
+	if (err_code != NRF_SUCCESS) { return ProvisioningResult::SDErrorOnBLEConfig; }
 
 	// Enable BLE stack.
 	err_code = nrf_sdh_ble_enable(&ram_start);
-	returnFalseOnSDError();
+	if (err_code != NRF_SUCCESS) { return ProvisioningResult::SDErrorOnBLEEnable; }
 
 	/*
 	 * Register a handler for BLE events.
@@ -136,7 +137,7 @@ bool Softdevice::enable() {
 	//NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, NULL);
 	NRF_SDH_BLE_OBSERVER(bleObserver, APP_BLE_OBSERVER_PRIO, dispatchBleEvent, nullptr);
 #endif
-	return true;
+	return ProvisioningResult::SDStartedSuccessfully;
 }
 
 

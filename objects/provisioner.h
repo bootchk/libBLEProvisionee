@@ -43,9 +43,20 @@ typedef void (*ProvisioningFailCallback)();
 
 
 enum class ProvisioningResult {
-	SDError,
+	// OK
 	Provisioned,
-	NotProvisioned
+	NotProvisioned,
+	SDEnabledSuccessfully,
+	SDStartedSuccessfully,
+	// Not OK
+	SDError,
+	SDErrorOnSDEnable,
+	SDErrorOnBLEConfig,
+	SDErrorOnBLEEnable,
+};
+
+enum class StartResult {
+
 };
 
 class Provisioner {
@@ -60,7 +71,7 @@ private:
 	 * Service advertises, accepts connections, and writes.
 	 * Callbacks when writes are accepted.
 	 */
-	static bool start();
+	static ProvisioningResult start();
 	static void shutdown();
 
 	static void onTimerElapsed();
