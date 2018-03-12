@@ -26,7 +26,8 @@ void provisioningSuccededCallback(
 
 
 void sleepUntilNextProvisioningSession() {
-	Sleeper::sleepDuration(800000);	// 2.4s
+	//Sleeper::sleepDuration(800000);	// 2.4s
+	Sleeper::sleepDuration(800);	// ? s
 }
 
 
@@ -50,8 +51,9 @@ int main(void)
 		// Here you do "normal" app, including using radio if not provisioning
 
 		// Start a provisioning session.
-		Provisioner::provisionWithSleep();
-
+		ProvisioningResult result;
+		result = Provisioner::provisionWithSleep();
+		(void) result;
 		/*
 		 * On wake:
 		 * SD is disabled.

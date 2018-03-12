@@ -17,11 +17,15 @@ include("CMakeEnv")
 # set var that configures CMake_nRF5x
 set(NRF_FAMILY "nrf52")
 
-#set(CHIP "nrf52832")
-#set(SOFTDEVICE "s132")
+set(CHIP "nrf52832")
+set(SOFTDEVICE "s132")
+# chip has FPU but we elect not to use it
+set(FLOAT_ABI "soft")
+# also below:  Debug52
 
-set(CHIP "nrf52810")
-set(SOFTDEVICE "s112")
+#set(CHIP "nrf52810")
+#set(SOFTDEVICE "s112")
+# also below: Release52
 
 
 # scripts specific to nRF5x building
@@ -33,6 +37,7 @@ nRF5CheckSetupPreconditions()
 
 # Must set linker script before build options
 # Broken for my use:  nRF5SetSoftdeviceLinkerScript(NRF5_LINKER_SCRIPT "s132")
+# Only for the text harness target
 set(NRF5_LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/gcc_nrf52.ld")
 
 nRF5SetBuildOptions()
@@ -47,6 +52,9 @@ nRF5SDKSourcesBLE()
 # define sources needed startup an executable (the test harness)
 nRF5SDKSourcesStartup()
 
+# Needed if logging enabled in sdk_config.h
+#nRF5x_addNRF_LOG()
+#nRF5x_addRTT()
 
 
 # build lib
@@ -70,15 +78,15 @@ nRF5SetSoftdevicePaths(SOFTDEVICE_PATH ${SOFTDEVICE})
 add_library(radioSoC52wSD STATIC IMPORTED)
 set_target_properties( radioSoC52wSD
     PROPERTIES 
-        IMPORTED_LOCATION /home/bootch/git/radioSoC/Release52/libradioSoC52wSD.a
+        IMPORTED_LOCATION /home/bootch/git/radioSoC/Debug52wSD/libradioSoC52wSD.a
         INTERFACE_INCLUDE_DIRECTORIES "/home/bootch/git/radioSoC/src/"
     )
 
 add_library(nRF5x STATIC IMPORTED)
-set_target_properties( nRF5x PROPERTIES IMPORTED_LOCATION /home/bootch/git/nRF5x/Release52/libnRF5x52.a )
+set_target_properties( nRF5x PROPERTIES IMPORTED_LOCATION /home/bootch/git/nRF5x/Debug52/libnRF5x52.a )
 
 add_library(embeddedMath STATIC IMPORTED)
-set_target_properties( embeddedMath PROPERTIES IMPORTED_LOCATION /home/bootch/git/embeddedMath/Release52/libembeddedMath52.a )
+set_target_properties( embeddedMath PROPERTIES IMPORTED_LOCATION /home/bootch/git/embeddedMath/Debug52/libembeddedMath52.a )
 
 add_library(NRFDrivers STATIC IMPORTED)
 set_target_properties( NRFDrivers PROPERTIES IMPORTED_LOCATION /home/bootch/git/libNRFDrivers/Debug/libNRFDrivers.a )
