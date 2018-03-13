@@ -52,6 +52,7 @@
 
 #include "uuid.h"
 
+#include "services/logger.h"
 
 
 
@@ -83,6 +84,8 @@ void BLEProtocol::start() {
 	// Connection Module requires app_timer.  AppTimer::init() call must precede??
 	Connection::initParams();
 #endif
+
+	RTTLogger::log(" BLE started.");
 }
 
 

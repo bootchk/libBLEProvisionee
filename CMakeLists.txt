@@ -14,14 +14,16 @@ message("${CMAKE_MODULE_PATH}")
 # i.e. file CMakeEnv.cmake on the MODULE_PATH
 include("CMakeEnv")
 
-# set var that configures CMake_nRF5x
+# set vars referenced by CMake_nRF5x macros
+# nowhere are the valid combinations checked.
+# see nRF5Sanity.cmake, nRF5CheckSetupPreconditions()
 set(NRF_FAMILY "nrf52")
-
-set(CHIP "nrf52832")
+set(CHIP "nrf52832_xxaa")
 set(SOFTDEVICE "s132")
-# chip has FPU but we elect not to use it
 set(FLOAT_ABI "soft")
-# also below:  Debug52
+
+# also below:  Debug52 vs Release52
+# should name the libraries for their combo, i.e. libFoo_s132_opt
 
 #set(CHIP "nrf52810")
 #set(SOFTDEVICE "s112")

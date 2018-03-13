@@ -3,6 +3,8 @@
 
 #include <inttypes.h>
 
+#include "services/logger.h"
+
 
 // #include "app_error.h"	// APP_ERROR_CHECK
 
@@ -137,6 +139,8 @@ ProvisioningResult Softdevice::enable() {
 	//NRF_SDH_BLE_OBSERVER(m_ble_observer, APP_BLE_OBSERVER_PRIO, ble_evt_handler, NULL);
 	NRF_SDH_BLE_OBSERVER(bleObserver, APP_BLE_OBSERVER_PRIO, dispatchBleEvent, nullptr);
 #endif
+
+	RTTLogger::log(" SD enabled.");
 	return ProvisioningResult::SDStartedSuccessfully;
 }
 

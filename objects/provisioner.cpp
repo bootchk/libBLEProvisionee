@@ -9,7 +9,8 @@
 
 #include "rssi.h"
 
-#include "nrfLog.h"
+//#include "nrfLog.h"
+#include "services/logger.h"
 
 
 
@@ -61,7 +62,7 @@ void Provisioner::init(ProvisioningSucceedCallback aSucceedCallback, Provisionin
  */
 
 ProvisioningResult Provisioner::start() {
-	NRFLog::log("Provisioner start");
+	RTTLogger::log("Provisioner start");
 
 	// provisioning sessions are one at a time
 	assert(!isProvisioning());
@@ -78,7 +79,7 @@ ProvisioningResult Provisioner::start() {
 }
 
 void Provisioner::shutdown() {
-	NRFLog::log("Provisioner shutdown");
+	RTTLogger::log("Provisioner shutdown");
 
 	// Might be in a connection.
 	// Assume SD handles that case.
@@ -106,7 +107,7 @@ void Provisioner::shutdown() {
  */
 void Provisioner::provisionElapsedTimerHandler(TimerInterruptReason reason) {
 	assert( Provisioner::isProvisioning() );
-	NRFLog::log("provisioner RTC interrupt");
+	RTTLogger::log("provisioner RTC interrupt");
 
 	switch(reason) {
 	case OverflowOrOtherTimerCompare:
@@ -199,11 +200,11 @@ ProvisioningResult Provisioner::provisionWithSleep() {
 	ProvisioningResult startResult;
 	startResult = start();
 	if ( startResult != ProvisioningResult::SDStartedSuccessfully ) {
-		NRFLog::log("Provisioner unable to start");
+		RTTLogger::log("Provisioner unable to start");
 		result = startResult;
 	}
 	else {
-		NRFLog::log("Provisioner sleeps");
+		RTTLogger::log("Provisioner sleeps");
 
 		// Blocks in low-power until timer expires or client provisions us via Softdevice
 		SoftdeviceSleeper::sleepInSDUntilTimeoutOrCanceled(Provisioner::ProvisioningSessionDuration);

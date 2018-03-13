@@ -3,7 +3,10 @@
 #include "advertiserDirect.h"
 
 #include "advertisement.h"
-#include "nrfLog.h"
+
+
+#include "services/logger.h"
+//#include "nrfLog.h"
 
 
 #include <inttypes.h>
@@ -57,14 +60,14 @@ void DirectAdvertiser::startAdvertising() {
 
 	assert(Advertisement::isInit());
 
-	NRFLog::log("started advertising\n");
+	RTTLogger::log("started advertising\n");
 
 	err_code = sd_ble_gap_adv_start(&advertisingParams, APP_BLE_CONN_CFG_TAG);
 	APP_ERROR_CHECK(err_code);
 }
 
 void DirectAdvertiser::stopAdvertising() {
-	NRFLog::log("stop advertising\n");
+	RTTLogger::log("stop advertising\n");
 	uint32_t err_code;
 	err_code = sd_ble_gap_adv_stop();
 	APP_ERROR_CHECK(err_code);
