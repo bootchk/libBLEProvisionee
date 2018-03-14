@@ -140,8 +140,8 @@ ProvisioningResult Softdevice::enable() {
 	NRF_SDH_BLE_OBSERVER(bleObserver, APP_BLE_OBSERVER_PRIO, dispatchBleEvent, nullptr);
 #endif
 
-	RTTLogger::log(" SD enabled.");
-	return ProvisioningResult::SDStartedSuccessfully;
+	// RTTLogger::log(" SD enabled.");
+	return ProvisioningResult::SDEnabledOK;
 }
 
 

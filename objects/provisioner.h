@@ -46,8 +46,8 @@ enum class ProvisioningResult {
 	// OK
 	Provisioned,
 	NotProvisioned,
-	SDEnabledSuccessfully,
-	SDStartedSuccessfully,
+	SDEnabledOK,
+	BLEStartedOK,
 	// Not OK
 	SDError,
 	SDErrorOnSDEnable,

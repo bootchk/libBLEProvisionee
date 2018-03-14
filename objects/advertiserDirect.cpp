@@ -60,14 +60,14 @@ void DirectAdvertiser::startAdvertising() {
 
 	assert(Advertisement::isInit());
 
-	RTTLogger::log("started advertising\n");
+	//RTTLogger::log(" Advertising start.");
 
 	err_code = sd_ble_gap_adv_start(&advertisingParams, APP_BLE_CONN_CFG_TAG);
 	APP_ERROR_CHECK(err_code);
 }
 
 void DirectAdvertiser::stopAdvertising() {
-	RTTLogger::log("stop advertising\n");
+	//RTTLogger::log("stop advertising\n");
 	uint32_t err_code;
 	err_code = sd_ble_gap_adv_stop();
 	APP_ERROR_CHECK(err_code);

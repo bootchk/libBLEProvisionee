@@ -6,20 +6,29 @@
 // One of protocols is BLE
 #include "bleProtocol.h"
 
+#include "services/logger.h"
+
 
 
 ProvisioningResult ProtocolStack::startup() {
 
+	ProvisioningResult startupResult;
+
 	ProvisioningResult enableSDResult;
 	enableSDResult = Softdevice::enable();
-	if ( enableSDResult != ProvisioningResult::SDEnabledSuccessfully  ) return enableSDResult;
+	if ( enableSDResult != ProvisioningResult::SDEnabledOK  ) {
+		RTTLogger::log(" SD enable fail.");
+		startupResult = enableSDResult;
+	}
 
 	BLEProtocol::start();
 
 	BLEProtocol::startAdvertising();
 
 	// We don't have results for start() and startAd()
-	return enableSDResult;
+	startupResult = ProvisioningResult::BLEStartedOK;
+
+	return startupResult;
 }
 
 

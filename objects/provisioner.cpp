@@ -62,7 +62,7 @@ void Provisioner::init(ProvisioningSucceedCallback aSucceedCallback, Provisionin
  */
 
 ProvisioningResult Provisioner::start() {
-	RTTLogger::log("Provisioner start");
+	// RTTLogger::log(" Provisioner start.");
 
 	// provisioning sessions are one at a time
 	assert(!isProvisioning());
@@ -72,14 +72,14 @@ ProvisioningResult Provisioner::start() {
 
 	ProvisioningResult startResult;
 	startResult = ProtocolStack::startup();
-	if ( startResult == ProvisioningResult::SDStartedSuccessfully  ) {
+	if ( startResult == ProvisioningResult::BLEStartedOK  ) {
 		isProvisioningFlag = true;
 	}
 	return startResult;
 }
 
 void Provisioner::shutdown() {
-	RTTLogger::log("Provisioner shutdown");
+	//RTTLogger::log("Provisioner shutdown");
 
 	// Might be in a connection.
 	// Assume SD handles that case.
@@ -107,7 +107,7 @@ void Provisioner::shutdown() {
  */
 void Provisioner::provisionElapsedTimerHandler(TimerInterruptReason reason) {
 	assert( Provisioner::isProvisioning() );
-	RTTLogger::log("provisioner RTC interrupt");
+	//RTTLogger::log("provisioner RTC interrupt");
 
 	switch(reason) {
 	case OverflowOrOtherTimerCompare:
@@ -199,12 +199,12 @@ ProvisioningResult Provisioner::provisionWithSleep() {
 
 	ProvisioningResult startResult;
 	startResult = start();
-	if ( startResult != ProvisioningResult::SDStartedSuccessfully ) {
-		RTTLogger::log("Provisioner unable to start");
+	if ( startResult != ProvisioningResult::BLEStartedOK ) {
+		RTTLogger::log("Provisioner fail start.");
 		result = startResult;
 	}
 	else {
-		RTTLogger::log("Provisioner sleeps");
+		//RTTLogger::log("Provisioner sleeps");
 
 		// Blocks in low-power until timer expires or client provisions us via Softdevice
 		SoftdeviceSleeper::sleepInSDUntilTimeoutOrCanceled(Provisioner::ProvisioningSessionDuration);

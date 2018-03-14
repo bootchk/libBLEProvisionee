@@ -85,7 +85,7 @@ void BLEProtocol::start() {
 	Connection::initParams();
 #endif
 
-	RTTLogger::log(" BLE started.");
+	//RTTLogger::log(" BLE started.");
 }
 
 
