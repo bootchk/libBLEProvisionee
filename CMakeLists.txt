@@ -14,20 +14,8 @@ message("${CMAKE_MODULE_PATH}")
 # i.e. file CMakeEnv.cmake on the MODULE_PATH
 include("CMakeEnv")
 
-# set vars referenced by CMake_nRF5x macros
-# nowhere are the valid combinations checked.
-# see nRF5Sanity.cmake, nRF5CheckSetupPreconditions()
-set(NRF_FAMILY "nrf52")
-set(CHIP "nrf52832_xxaa")
-set(SOFTDEVICE "s132")
-set(FLOAT_ABI "soft")
-
 # also below:  Debug52 vs Release52
 # should name the libraries for their combo, i.e. libFoo_s132_opt
-
-#set(CHIP "nrf52810")
-#set(SOFTDEVICE "s112")
-# also below: Release52
 
 
 # scripts specific to nRF5x building
@@ -37,11 +25,6 @@ include("nRF5")
 
 nRF5CheckSetupPreconditions()
 
-# Must set linker script before build options
-# Broken for my use:  nRF5SetSoftdeviceLinkerScript(NRF5_LINKER_SCRIPT "s132")
-# Only for the text harness target
-set(NRF5_LINKER_SCRIPT "${CMAKE_SOURCE_DIR}/gcc_nrf52.ld")
-
 nRF5SetBuildOptions()
 nRF5SetIncludePaths()
 
@@ -50,9 +33,6 @@ nRF5SetSDKSourcesBasic()
 # Also BLE
 nRF5SDKSourcesBLE()
 # SDK_SOURCES is now a list of SDK source files called by library and archived in library
-
-# define sources needed startup an executable (the test harness)
-nRF5SDKSourcesStartup()
 
 # Needed if logging enabled in sdk_config.h
 #nRF5x_addNRF_LOG()
@@ -65,13 +45,27 @@ nRF5SDKSourcesStartup()
 # note sources specified later
 add_library(BLEProvisionee "" )
 
-nRF5SetSoftdeviceIncludePaths( "BLEProvisionee" ${SOFTDEVICE})
-nRF5SetSoftdeviceDefinitions( "BLEProvisionee" ${SOFTDEVICE})
-nRF5SetChipCompileDefinitions( "BLEProvisionee" ${CHIP})
+set_target_properties( BLEProvisionee
+    PROPERTIES
+       CHIP "nrf52832_xxaa"
+       SOFTDEVICE "s132"
+       FLOAT_ABI "soft"
+    )
+
+nRF5ConfigTargetByProperties(BLEProvisionee)
+
+add_library(BLEProvisionee52810 "" )
+set_target_properties( BLEProvisionee52810
+    PROPERTIES
+       CHIP "nrf52810e"
+       SOFTDEVICE "s112"
+       FLOAT_ABI "soft"
+    )
+nRF5ConfigTargetByProperties(BLEProvisionee52810)
 
 # used only by custom target FLASH_SOFTDEVICE
 # TODO use it for more customer targets, one per SD 
-nRF5SetSoftdevicePaths(SOFTDEVICE_PATH ${SOFTDEVICE})
+nRF5SetSoftdevicePaths(SOFTDEVICE_PATH "s132")
 
 # import libs from outside project
 
@@ -114,11 +108,14 @@ ENDIF()
 # test harness that calls the lib
 # source declared later
 add_executable(testLibBLEProvisionee "")
-
-# executable target for same chip and softdevice
-nRF5SetSoftdeviceIncludePaths( "testLibBLEProvisionee" ${SOFTDEVICE})
-nRF5SetSoftdeviceDefinitions( "testLibBLEProvisionee" ${SOFTDEVICE})
-nRF5SetChipCompileDefinitions( "testLibBLEProvisionee" ${CHIP})
+set_target_properties( testLibBLEProvisionee
+   PROPERTIES
+       CHIP "nrf52832_xxaa"
+       SOFTDEVICE "s132"
+       FLOAT_ABI "soft"
+   )
+nRF5ConfigTargetByProperties(testLibBLEProvisionee)
+nRF5SetTargetsLinkerScript(testLibBLEProvisionee "${CMAKE_SOURCE_DIR}/gcc_nrf52.ld")
 
 
 
@@ -139,6 +136,13 @@ PRIVATE
 # AND radioSoC lib
 # TODO why doesn't the above declaration for radioSoC make the headers available?
 target_include_directories(BLEProvisionee
+   PUBLIC
+       "${CMAKE_CURRENT_LIST_DIR}"
+       "${CMAKE_CURRENT_LIST_DIR}/objects"
+       "/home/bootch/git/radioSoC/src"
+       )
+# Same for 52810
+target_include_directories(BLEProvisionee52810
    PUBLIC
        "${CMAKE_CURRENT_LIST_DIR}"
        "${CMAKE_CURRENT_LIST_DIR}/objects"
@@ -176,7 +180,12 @@ target_sources(BLEProvisionee
        "${FacadeSources}"
        "${SDK_SOURCES}"
    )
-   
+# Same sources for 52810 variant
+target_sources(BLEProvisionee52810
+   PUBLIC
+       "${FacadeSources}"
+       "${SDK_SOURCES}"
+   )   
    
 # sources of test harness
 # a main which calls the library
@@ -185,7 +194,6 @@ target_sources(BLEProvisionee
 target_sources(testLibBLEProvisionee
    PUBLIC
        "${CMAKE_CURRENT_LIST_DIR}/main.cpp"
-       "${SDK_SOURCES_STARTUP}"
    )
  
  
@@ -193,7 +201,6 @@ nRF5GenerateOtherArtifacts(testLibBLEProvisionee)
 nRF5AddCustomTargets(testLibBLEProvisionee)
 
 message("SDK_SOURCES:  ${SDK_SOURCES}")
-message("SDK_SOURCES_STARTUP: ${SDK_SOURCES_STARTUP}")
 
 
 
