@@ -51,17 +51,16 @@ set_target_properties( BLEProvisionee
        SOFTDEVICE "s132"
        FLOAT_ABI "soft"
     )
-
 nRF5ConfigTargetByProperties(BLEProvisionee)
 
-add_library(BLEProvisionee52810 "" )
-set_target_properties( BLEProvisionee52810
+add_library(BLEProvisionee52810e "" )
+set_target_properties( BLEProvisionee52810e
     PROPERTIES
        CHIP "nrf52810e"
        SOFTDEVICE "s112"
        FLOAT_ABI "soft"
     )
-nRF5ConfigTargetByProperties(BLEProvisionee52810)
+nRF5ConfigTargetByProperties(BLEProvisionee52810e)
 
 # used only by custom target FLASH_SOFTDEVICE
 # TODO use it for more customer targets, one per SD 
@@ -142,7 +141,7 @@ target_include_directories(BLEProvisionee
        "/home/bootch/git/radioSoC/src"
        )
 # Same for 52810
-target_include_directories(BLEProvisionee52810
+target_include_directories(BLEProvisionee52810e
    PUBLIC
        "${CMAKE_CURRENT_LIST_DIR}"
        "${CMAKE_CURRENT_LIST_DIR}/objects"
@@ -180,8 +179,8 @@ target_sources(BLEProvisionee
        "${FacadeSources}"
        "${SDK_SOURCES}"
    )
-# Same sources for 52810 variant
-target_sources(BLEProvisionee52810
+# Same sources for 52810 variant emulated
+target_sources(BLEProvisionee52810e
    PUBLIC
        "${FacadeSources}"
        "${SDK_SOURCES}"
