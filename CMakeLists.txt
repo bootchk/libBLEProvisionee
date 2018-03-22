@@ -190,6 +190,7 @@ target_sources(BLEProvisionee52810e
 # a main which calls the library
 # and SDK sources that startup the app
 # choose main.cpp or main2.cpp (minimal)
+nRF5SetTargetStartupSources(testLibBLEProvisionee)
 target_sources(testLibBLEProvisionee
    PUBLIC
        "${CMAKE_CURRENT_LIST_DIR}/main.cpp"
