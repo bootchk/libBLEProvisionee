@@ -11,4 +11,5 @@ public:
 	static void onWriteCharacteristic(const ble_gatts_evt_write_t *);
 	static void onConnect();
 	static void onDisconnect();
+	static void onAdvertisingTimeout();
 };

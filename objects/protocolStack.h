@@ -16,7 +16,7 @@
 class ProtocolStack {
 public:
 	// returns false if fails
-	static ProvisioningResult startup();
+	static APIError startup();
 
 	static void shutdown();
 

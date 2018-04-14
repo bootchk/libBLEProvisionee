@@ -34,8 +34,8 @@ void initParams() {
 	advertisingParams.type        = BLE_GAP_ADV_TYPE_ADV_IND;
 	advertisingParams.p_peer_addr = NULL; // Undirected advertisement.
 	advertisingParams.fp          = BLE_GAP_ADV_FP_ANY;
-	advertisingParams.interval    = APP_ADV_INTERVAL;
-	advertisingParams.timeout     = APP_ADV_TIMEOUT_IN_SECONDS;
+	advertisingParams.interval    = Advertiser::AdvertisingIntervalIn625uSec;
+	advertisingParams.timeout     = Advertiser::AdvertisingTimeoutInSeconds;
 }
 
 }
@@ -62,7 +62,7 @@ void DirectAdvertiser::startAdvertising() {
 
 	//RTTLogger::log(" Advertising start.");
 
-	err_code = sd_ble_gap_adv_start(&advertisingParams, APP_BLE_CONN_CFG_TAG);
+	err_code = sd_ble_gap_adv_start(&advertisingParams, Advertiser::ConnectionConfigTag);
 	APP_ERROR_CHECK(err_code);
 }
 

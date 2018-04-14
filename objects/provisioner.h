@@ -42,6 +42,7 @@ typedef void (*ProvisioningSucceedCallback)(
 typedef void (*ProvisioningFailCallback)();
 
 
+#ifdef OBSOLETE
 enum class ProvisioningResult {
 	// OK
 	Provisioned,
@@ -54,9 +55,29 @@ enum class ProvisioningResult {
 	SDErrorOnBLEConfig,
 	SDErrorOnBLEEnable,
 };
+#endif
 
-enum class StartResult {
+/*
+ * Results from session, conveyed to app in callback.
+ */
+enum class ProvisioningResult {
+	// OK
+	Provisioned,
+	NotProvisioned,
+	InternalError
+};
 
+/*
+ * Results from calls to Provisioner API.
+ */
+enum class APIError {
+	SDEnabledOK,
+	BLEStartedOK,
+	// Not OK
+	SDError,
+	SDErrorOnSDEnable,
+	SDErrorOnBLEConfig,
+	SDErrorOnBLEEnable,
 };
 
 class Provisioner {
@@ -64,16 +85,16 @@ class Provisioner {
 public:
 	static const int ProvisionedCharacteristicLength = 4;	// bytes
 
-private:
+
 	/*
 	 * Start provisioning service.
 	 * Service is separate task, this returns immediately.
 	 * Service advertises, accepts connections, and writes.
 	 * Callbacks when writes are accepted.
 	 */
-	static ProvisioningResult start();
+	static APIError start();
 	static void shutdown();
-
+private:
 	static void onTimerElapsed();
 
 public:
@@ -121,8 +142,20 @@ public:
 	 */
 	static void onProvisioned(ProvisionedValueType writtenValue);
 
+	/*
+	 * Called by BLE app when advertising timeouts
+	 *
+	 * Called from appHandler.cpp
+	 * i.e. events propagate from BLE resulting in ProvisioningCallback() call back to app.
+	 */
+	static void onAdvertisingTimeout();
 
-
+	/*
+	 * Similar to above.
+	 * Called for BLE errors.
+	 * Truncate session so it is not indefinite.
+	 */
+	static void onBLEError();
 
 	/*
 	 * Primary API
@@ -136,7 +169,7 @@ public:
 	 * Timeout is fixed constant.
 	 * Ensures SD disabled on return.
 	 */
-	static ProvisioningResult provisionWithSleep();
+	static APIError provisionWithSleep();
 
     static ProvisionedValueType getProvisionedValue();
 

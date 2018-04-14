@@ -18,13 +18,12 @@ enum class ReasonForSDWake {
  */
 class SoftdeviceSleeper {
 
-private:
+public:
 	/*
 	 * Sleep until any one event.
 	 */
 	static void sleepInSDUntilAnyEvent();
 
-public:
 	/*
 	 * Sleep until SD is disabled OR duration.
 	 * May return before duration has elapsed.

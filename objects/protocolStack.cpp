@@ -10,13 +10,13 @@
 
 
 
-ProvisioningResult ProtocolStack::startup() {
+APIError ProtocolStack::startup() {
 
-	ProvisioningResult startupResult;
+	APIError startupResult;
 
-	ProvisioningResult enableSDResult;
+	APIError enableSDResult;
 	enableSDResult = Softdevice::enable();
-	if ( enableSDResult != ProvisioningResult::SDEnabledOK  ) {
+	if ( enableSDResult != APIError::SDEnabledOK  ) {
 		RTTLogger::log(" SD enable fail.");
 		startupResult = enableSDResult;
 	}
@@ -26,7 +26,7 @@ ProvisioningResult ProtocolStack::startup() {
 	BLEProtocol::startAdvertising();
 
 	// We don't have results for start() and startAd()
-	startupResult = ProvisioningResult::BLEStartedOK;
+	startupResult = APIError::BLEStartedOK;
 
 	return startupResult;
 }

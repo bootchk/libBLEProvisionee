@@ -44,7 +44,6 @@ nRF5SDKSourcesBLE()
 # note the logical name does not have prefix "lib", which cmake adds 
 # note sources specified later
 add_library(BLEProvisionee "" )
-
 set_target_properties( BLEProvisionee
     PROPERTIES
        CHIP "nrf52832_xxaa"
@@ -52,6 +51,8 @@ set_target_properties( BLEProvisionee
        FLOAT_ABI "soft"
     )
 nRF5ConfigTargetByProperties(BLEProvisionee)
+
+
 
 add_library(BLEProvisionee52810e "" )
 set_target_properties( BLEProvisionee52810e
@@ -61,6 +62,8 @@ set_target_properties( BLEProvisionee52810e
        FLOAT_ABI "soft"
     )
 nRF5ConfigTargetByProperties(BLEProvisionee52810e)
+
+
 
 # used only by custom target FLASH_SOFTDEVICE
 # TODO use it for more customer targets, one per SD 
@@ -81,7 +84,9 @@ add_library(nRF5x STATIC IMPORTED)
 set_target_properties( nRF5x PROPERTIES IMPORTED_LOCATION /home/bootch/git/nRF5x/Debug52/libnRF5x52.a )
 
 add_library(embeddedMath STATIC IMPORTED)
-set_target_properties( embeddedMath PROPERTIES IMPORTED_LOCATION /home/bootch/git/embeddedMath/Debug52/libembeddedMath52.a )
+set_target_properties( embeddedMath PROPERTIES 
+    IMPORTED_LOCATION /home/bootch/git/embeddedMath/Debug52/libembeddedMath52.a 
+    INTERFACE_INCLUDE_DIRECTORIES "/home/bootch/git/embeddedMath/src/")
 
 add_library(NRFDrivers STATIC IMPORTED)
 set_target_properties( NRFDrivers PROPERTIES IMPORTED_LOCATION /home/bootch/git/libNRFDrivers/Debug/libNRFDrivers.a )
@@ -198,8 +203,8 @@ target_sources(testLibBLEProvisionee
  
 
 # No need for other artifacts, not burned to ROM independently
-#nRF5GenerateOtherArtifacts(testLibBLEProvisionee)
-#nRF5AddCustomTargets(testLibBLEProvisionee)
+nRF5GenerateOtherArtifacts(testLibBLEProvisionee)
+nRF5AddCustomTargets(testLibBLEProvisionee)
 
 message("SDK_SOURCES:  ${SDK_SOURCES}")
 

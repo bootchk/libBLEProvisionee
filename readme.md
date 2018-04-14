@@ -75,6 +75,33 @@ periodic provisioning service
 main2.cpp is even more minimal, just calling one function of the library (Softdevice::enable()).
 Use this to test the build process.
 
+
+API
+-
+See main.cpp for example using simple looping.
+
+If using a "RunToCompletion Task" design, where every task is an ISR, your main() sleep loop must be compatible with SD while provisioning.
+When you call Provisioner::start(), it returns and your app sleeps (but Softdevice is active and doing provisioning.)
+Your main loop may wake for BLE events, but often you have no scheduled tasks (but you might).
+Provisioner will call back in a finite time, either success or fail (where fail is timeout or BLE error).
+In the callback, you should schedule another task to shutdown Provisioner, and your continuation after the provisioning session.
+
+Changelog
+-
+
+Original:
+
+    - API the provisionWithSleep() call blocks.  It is low-power, but does not return immediately.  
+    It returns a result.
+    - Duration of session is compile time constant.
+    - Implementation: used a Timer from radioSoC library, with all its dependencies.  Advertising is without timeout.  
+
+v2
+
+    - API the provision() call does not block.  It returns immediately. App is expected to sleep using SD compatible sleep.
+    It does not return a result.  Instead, the app receives callbacks.
+    - Implementation: Advertising may timeout.  I.E. timers provided by the Softdevice.  No dependency on radioSoC library.
+
 Dependencies
 -
 
@@ -127,13 +154,20 @@ Building
 
 Uses CMake and a command line.
 
-First edit CMakeEnv.cmake (in your clone of nRF5Cmake repository)
+First:
 
-Then
-
-    mkdir Debug   ( or another name)
-    cmake -H. -B"Debug" -G "Ninja"    ( or "Unix Makefiles")
-    cmake --build "Debug" --target testLibBLEProvisionee
+    - edit CMakeEnv.cmake (in your clone of nRF5Cmake repository)
+    - edit toolchain-gnu-arm.cmake (in your clone of nRF5Cmake repository)
+    
+    mkdir Debug
+    cd Debug
+    cmake    -G "Ninja"    -DCMAKE_TOOLCHAIN_FILE=/home/bootch/git/nRF5Cmake/toolchain-gnu-arm.cmake     ..
+    #       ninja, not make     use toolchain file                                look in parent dir for CMakeLists.txt
+    cmake --build .               --target testLibBLEProvisionee
+    #     build in present working dir        target is the test harness
+    cmake --build .               --target BLEProvisionee
+    #                                target is the library
+    
 
 The former creates the build directory and Makefiles.
 The latter builds the test harness.
@@ -142,11 +176,11 @@ If you don't want the test harness:  --target BLEProvisionee
 
 At least once burn the Softdevice (a layer implementing BT) to a separate area of ROM:
 
-    cmake --build "Debug52" --target FLASH_SOFTDEVICE
+    cmake --build "Debug" --target FLASH_SOFTDEVICE
     
 To burn to a NRF52DK dev board:
 
-    cmake --build "Debug52" --target FLASH_testLibBLEProvisionee
+    cmake --build "Debug" --target FLASH_testLibBLEProvisionee
     
 The app will start running on the DK, and periodically advertise its "provisioning" service.
 In very short bursts (2mSec) which you might need to change.

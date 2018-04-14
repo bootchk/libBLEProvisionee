@@ -45,7 +45,7 @@
 
 
 
-ProvisioningResult Softdevice::enable() {
+APIError Softdevice::enable() {
 	uint32_t           err_code;
 
 	// NRFLog::log("Enable SD\n");
@@ -95,7 +95,7 @@ ProvisioningResult Softdevice::enable() {
 	NRFLog::flush();
 #else
 	err_code = nrf_sdh_enable_request();
-	if (err_code != NRF_SUCCESS) { return ProvisioningResult::SDErrorOnSDEnable ; }
+	if (err_code != NRF_SUCCESS) { return APIError::SDErrorOnSDEnable ; }
 
 	ASSERT(nrf_sdh_is_enabled());
 
@@ -119,11 +119,11 @@ ProvisioningResult Softdevice::enable() {
 	 * run through debugger, then change .ld file.
 	 */
 	err_code = nrf_sdh_ble_default_cfg_set(Softdevice::ProtocolTag, &ram_start);
-	if (err_code != NRF_SUCCESS) { return ProvisioningResult::SDErrorOnBLEConfig; }
+	if (err_code != NRF_SUCCESS) { return APIError::SDErrorOnBLEConfig; }
 
 	// Enable BLE stack.
 	err_code = nrf_sdh_ble_enable(&ram_start);
-	if (err_code != NRF_SUCCESS) { return ProvisioningResult::SDErrorOnBLEEnable; }
+	if (err_code != NRF_SUCCESS) { return APIError::SDErrorOnBLEEnable; }
 
 	/*
 	 * Register a handler for BLE events.
@@ -141,7 +141,7 @@ ProvisioningResult Softdevice::enable() {
 #endif
 
 	// RTTLogger::log(" SD enabled.");
-	return ProvisioningResult::SDEnabledOK;
+	return APIError::SDEnabledOK;
 }
 
 

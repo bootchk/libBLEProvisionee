@@ -12,7 +12,7 @@ class Softdevice {
 	static const int ProtocolTag = 1;
 
 public:
-	static ProvisioningResult enable();
+	static APIError enable();
 	static bool isEnabled();
 	static void disable();
 

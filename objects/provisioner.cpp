@@ -25,6 +25,10 @@ ProvisionedValueType provision;
 ProvisioningSucceedCallback succeedCallback = nullptr;
 ProvisioningFailCallback failCallback = nullptr;
 
+// TODO implement this for errors returned by SD after start advertising???
+// ProvisioningFailCallback errorCallback = nullptr;
+
+
 
 // assert not in interrupt context, app is not realtime constrained.
 void callbackAppWithProvisioningResult() {
@@ -61,7 +65,7 @@ void Provisioner::init(ProvisioningSucceedCallback aSucceedCallback, Provisionin
  * start() and shutdown() should be mirror images
  */
 
-ProvisioningResult Provisioner::start() {
+APIError Provisioner::start() {
 	// RTTLogger::log(" Provisioner start.");
 
 	// provisioning sessions are one at a time
@@ -70,9 +74,9 @@ ProvisioningResult Provisioner::start() {
 	// assert self initialized
 	assert(succeedCallback != nullptr);
 
-	ProvisioningResult startResult;
+	APIError startResult;
 	startResult = ProtocolStack::startup();
-	if ( startResult == ProvisioningResult::BLEStartedOK  ) {
+	if ( startResult == APIError::BLEStartedOK  ) {
 		isProvisioningFlag = true;
 	}
 	return startResult;
@@ -189,17 +193,17 @@ bool Provisioner::isProvisioning() {
 
 
 
-ProvisioningResult Provisioner::provisionWithSleep() {
+APIError Provisioner::provisionWithSleep() {
 
-	ProvisioningResult result;
+	APIError result;
 
 	// Clear flag before starting session, it may succeed before we get to sleep
 	SoftdeviceSleeper::setReasonForSDWake(ReasonForSDWake::Cleared);
 
 
-	ProvisioningResult startResult;
+	APIError startResult;
 	startResult = start();
-	if ( startResult != ProvisioningResult::BLEStartedOK ) {
+	if ( startResult != APIError::BLEStartedOK ) {
 		RTTLogger::log("Provisioner fail start.");
 		result = startResult;
 	}
@@ -220,13 +224,33 @@ ProvisioningResult Provisioner::provisionWithSleep() {
 
 		callbackAppWithProvisioningResult();
 
+#ifdef OBSOLETE
 		if ( provisioningSessionResult )
 			result = ProvisioningResult::Provisioned;
 		else
 			result = ProvisioningResult::NotProvisioned;
+#endif
 	}
 	return result;
 }
 
 
+
+void Provisioner::sleep() {
+	SoftdeviceSleeper::sleepInSDUntilAnyEvent();
+}
+
+
+
+void Provisioner::onAdvertisingTimeout() {
+	// Require results is still false, to ensure callback is the failCallback
+	assert(provisioningSessionResult == false);
+	callbackAppWithProvisioningResult();
+}
+
+void Provisioner::onBLEError() {
+	// Not a separate callback for errors: fail means nothing in range, or error
+	assert(provisioningSessionResult == false);
+	callbackAppWithProvisioningResult();
+}
 

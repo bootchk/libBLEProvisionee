@@ -64,7 +64,10 @@ void AppHandler::onWriteCharacteristic(const ble_gatts_evt_write_t * aWrite) {
 		 * and not one that my app has defined.
 		 */
 		RTTLogger::log("Write to unexpected characteristic.");
-
+		/*
+		 * Tell Provisioner so it can truncate session, so session is not indefinite.
+		 */
+		Provisioner::onBLEError();
 	}
 }
 
@@ -82,7 +85,11 @@ void AppHandler::onDisconnect(){
 	RTTLogger::log("Disconnected.\n");
 }
 
-// TODO app should care about advertisement timeouts.
-// e.g. it indicates there is no client e.g. provisioner existing in RF range.
+void AppHandler::onAdvertisingTimeout(){
+	// no client e.g. provisioner existing in RF range, ruring specified timeout
+	RTTLogger::log("Advertising timeout.\n");
+	Provisioner::onAdvertisingTimeout();
+}
+
 
 

@@ -188,6 +188,7 @@ void Softdevice::dispatchBleEvent( ble_evt_t const * bleEvent, void * context)
 
 	case BLE_GAP_EVT_TIMEOUT:	// 0x1B
 		RTTLogger::log("GAP advertising timeout");
+		AppHandler::onAdvertisingTimeout();
 		break;
 
 	case  BLE_GAP_EVT_RSSI_CHANGED:
