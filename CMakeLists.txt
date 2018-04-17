@@ -204,7 +204,7 @@ target_sources(testLibBLEProvisionee
 
 # No need for other artifacts, not burned to ROM independently
 nRF5GenerateOtherArtifacts(testLibBLEProvisionee)
-nRF5AddCustomTargets(testLibBLEProvisionee)
+#nRF5AddCustomTargets(testLibBLEProvisionee)
 
 message("SDK_SOURCES:  ${SDK_SOURCES}")
 

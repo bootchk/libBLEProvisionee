@@ -13,8 +13,8 @@ class Softdevice {
 
 public:
 	static APIError enable();
+	static APIError disable();
 	static bool isEnabled();
-	static void disable();
 
 	/*
 	 * Handler of BLE events from SD, some internal handling and some propagated to app.

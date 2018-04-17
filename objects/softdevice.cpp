@@ -141,7 +141,7 @@ APIError Softdevice::enable() {
 #endif
 
 	// RTTLogger::log(" SD enabled.");
-	return APIError::SDEnabledOK;
+	return APIError::SDStateChangeOK;
 }
 
 
@@ -151,7 +151,7 @@ bool Softdevice::isEnabled() {
 }
 
 
-void Softdevice::disable() {
+APIError Softdevice::disable() {
 	uint32_t   err_code;
 
 	// assert BLEProtocol already stopped
@@ -159,12 +159,8 @@ void Softdevice::disable() {
 	//NRFLog::log("Disable SD\n");
 	err_code = nrf_sdh_disable_request();
 
-	/*
-	 * Not checking error.
-	 * TODO are there any we can recover from?
-	 */
-	(void) err_code;
-
+	if (err_code != NRF_SUCCESS) { return APIError::SDErrorOnSDDisable; }
 	ASSERT(!nrf_sdh_is_enabled());
+	return APIError::SDStateChangeOK;
 }
 

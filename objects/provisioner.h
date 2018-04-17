@@ -71,11 +71,12 @@ enum class ProvisioningResult {
  * Results from calls to Provisioner API.
  */
 enum class APIError {
-	SDEnabledOK,
+	SDStateChangeOK,
 	BLEStartedOK,
 	// Not OK
 	SDError,
 	SDErrorOnSDEnable,
+	SDErrorOnSDDisable,
 	SDErrorOnBLEConfig,
 	SDErrorOnBLEEnable,
 };

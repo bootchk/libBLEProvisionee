@@ -16,7 +16,7 @@ APIError ProtocolStack::startup() {
 
 	APIError enableSDResult;
 	enableSDResult = Softdevice::enable();
-	if ( enableSDResult != APIError::SDEnabledOK  ) {
+	if ( enableSDResult != APIError::SDStateChangeOK  ) {
 		RTTLogger::log(" SD enable fail.");
 		startupResult = enableSDResult;
 	}
