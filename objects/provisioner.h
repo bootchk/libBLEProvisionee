@@ -1,8 +1,12 @@
 
 #pragma once
 
+#include <inttypes.h>
 
-#include "timerAdaptor.h"	// TimerInterruptReason
+
+// OBSOLETE #include "timerAdaptor.h"	// TimerInterruptReason
+
+
 
 /*
  * Provides provisioning over BLE, for a short duration.
@@ -130,10 +134,7 @@ public:
 	 * Callbacks, public so they can be passed to Softdevice
 	 */
 
-	/*
-	 * Callback from IRQ for Timer.
-	 */
-	static void provisionElapsedTimerHandler(TimerInterruptReason reason);
+
 
 	/*
 	 * Called by BLE app when client provisions.
@@ -164,13 +165,7 @@ public:
 
 	static void init(ProvisioningSucceedCallback, ProvisioningFailCallback );
 
-	/*
-	 * Do a provision session, sleeping in low power when idle.
-	 * Does not return until either provisioned or timeout expired.
-	 * Timeout is fixed constant.
-	 * Ensures SD disabled on return.
-	 */
-	static APIError provisionWithSleep();
+
 
     static ProvisionedValueType getProvisionedValue();
 
@@ -179,6 +174,19 @@ public:
 	 * Other rarely used or deprecated API
 	 */
 
+#ifdef OBSOLETE
+    /*
+     * Do a provision session, sleeping in low power when idle.
+     * Does not return until either provisioned or timeout expired.
+     * Timeout is fixed constant.
+     * Ensures SD disabled on return.
+     */
+    static APIError provisionWithSleep();
+
+	/*
+	 * Callback from IRQ for Timer.
+	 */
+	static void provisionElapsedTimerHandler(TimerInterruptReason reason);
 
 	/*
 	 * Start LF clock so that it is not stopped by SD when it is disabled.
@@ -187,7 +195,7 @@ public:
 	 * or provisioner is used by some app already started clocks.
 	 */
 	static void startClocks();
-
+#endif
 	/*
 	 * Has start been called and callback not occurred yet.
 	 */

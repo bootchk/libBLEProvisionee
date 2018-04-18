@@ -157,12 +157,10 @@ target_include_directories(BLEProvisionee52810e
  list(APPEND FacadeSources
        "${CMAKE_CURRENT_LIST_DIR}/objects/softdevice.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/softdeviceHandler.cpp"
-       "${CMAKE_CURRENT_LIST_DIR}/objects/softdeviceSleeper.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/gap.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/nrfLog.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/appHandler.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/provisioner.cpp"
-       "${CMAKE_CURRENT_LIST_DIR}/objects/timerAdaptor.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/protocolStack.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/bleProtocol.cpp"
        "${CMAKE_CURRENT_LIST_DIR}/objects/gatt.cpp"
@@ -175,6 +173,9 @@ target_include_directories(BLEProvisionee52810e
        "${CMAKE_CURRENT_LIST_DIR}/objects/rssi.cpp"
        )
  
+ #obsolete
+ #       "${CMAKE_CURRENT_LIST_DIR}/objects/timerAdaptor.cpp"
+ #      "${CMAKE_CURRENT_LIST_DIR}/objects/softdeviceSleeper.cpp"
 
 
 # sources for lib are just the facade classes

@@ -3,9 +3,8 @@
 #include <cassert>
 
 // Implementation facade classes
-#include <softdeviceSleeper.h>
 #include "protocolStack.h"
-#include "timerAdaptor.h"
+
 
 #include "rssi.h"
 
@@ -54,7 +53,7 @@ void Provisioner::init(ProvisioningSucceedCallback aSucceedCallback, Provisionin
 	succeedCallback = aSucceedCallback;
 	failCallback = aFailCallback;
 
-	TimerAdaptor::create(provisionElapsedTimerHandler);
+	// TimerAdaptor::create(provisionElapsedTimerHandler);
 
 	assert(! Provisioner::isProvisioning());	// enabled but not started
 }
@@ -102,29 +101,7 @@ void Provisioner::shutdown() {
 
 
 
-/*
- * ISR for RTCx.
- *
- * Interrupt does not necessarily mean that our timer (compare register) elapsed:
- * overflow and other compare registers (although there aren't any in use)
- * will also interrupt.
- */
-void Provisioner::provisionElapsedTimerHandler(TimerInterruptReason reason) {
-	assert( Provisioner::isProvisioning() );
-	//RTTLogger::log("provisioner RTC interrupt");
 
-	switch(reason) {
-	case OverflowOrOtherTimerCompare:
-		/*
-		 * Waked but Timer not expired.
-		 * Sleep again
-		 */
-		break;
-	case SleepTimerCompare:
-		onTimerElapsed();
-		break;
-	}
-}
 
 
 
@@ -145,7 +122,7 @@ void Provisioner::onProvisioned(ProvisionedValueType aProvision) {
 	assert(isProvisioning());
 
 	// We did not timeout, cancel timer.
-	TimerAdaptor::stop();
+	// TimerAdaptor::stop();
 
 	RSSI::captureLastRSSI();
 
@@ -153,7 +130,7 @@ void Provisioner::onProvisioned(ProvisionedValueType aProvision) {
 	 * Tell SoftdeviceSleeper to quit its sleeping loop.
 	 * Semantics are one-shot: any one provisioning ends sleep and session.
 	 */
-	SoftdeviceSleeper::setReasonForSDWake(ReasonForSDWake::Canceled);
+	// SoftdeviceSleeper::setReasonForSDWake(ReasonForSDWake::Canceled);
 
 	provision = aProvision;
 	provisioningSessionResult = true;
@@ -165,24 +142,29 @@ void Provisioner::onProvisioned(ProvisionedValueType aProvision) {
 	 */
 }
 
-void Provisioner::onTimerElapsed() {
-	// Time elapsed without any client provisioning us
-	SoftdeviceSleeper::setReasonForSDWake(ReasonForSDWake::TimedOut);
-
-	provisioningSessionResult = false;
-
-	// assert time is oneshot and thus no longer enabled
-}
 
 
 
 
 
+#ifdef OBSOLETE
+
+#include <softdeviceSleeper.h>
+#include "timerAdaptor.h"
 
 void Provisioner::startClocks(){
 	// delegate
 	TimerAdaptor::startClocks();
 }
+
+void Provisioner::sleep() {
+	SoftdeviceSleeper::sleepInSDUntilAnyEvent();
+}
+#endif
+
+
+
+
 
 
 bool Provisioner::isProvisioning() {
@@ -193,52 +175,10 @@ bool Provisioner::isProvisioning() {
 
 
 
-APIError Provisioner::provisionWithSleep() {
-
-	APIError result;
-
-	// Clear flag before starting session, it may succeed before we get to sleep
-	SoftdeviceSleeper::setReasonForSDWake(ReasonForSDWake::Cleared);
-
-
-	APIError startResult;
-	startResult = start();
-	if ( startResult != APIError::BLEStartedOK ) {
-		RTTLogger::log("Provisioner fail start.");
-		result = startResult;
-	}
-	else {
-		//RTTLogger::log("Provisioner sleeps");
-
-		// Blocks in low-power until timer expires or client provisions us via Softdevice
-		SoftdeviceSleeper::sleepInSDUntilTimeoutOrCanceled(Provisioner::ProvisioningSessionDuration);
-
-		// Must be a reason we are not sleeping anymore
-		// TODO check the exact set of reasons we expect
-		// If SD wakes us for an unknown reason, it might be left in a bad state.
-		assert(SoftdeviceSleeper::getReasonForSDWake() != ReasonForSDWake::Cleared);
-
-		shutdown();
-		// assert hw resources not used by SD, can be used by app
-		assert(! Provisioner::isProvisioning());
-
-		callbackAppWithProvisioningResult();
-
-#ifdef OBSOLETE
-		if ( provisioningSessionResult )
-			result = ProvisioningResult::Provisioned;
-		else
-			result = ProvisioningResult::NotProvisioned;
-#endif
-	}
-	return result;
-}
 
 
 
-void Provisioner::sleep() {
-	SoftdeviceSleeper::sleepInSDUntilAnyEvent();
-}
+
 
 
 
