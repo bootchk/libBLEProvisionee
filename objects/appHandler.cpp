@@ -31,7 +31,7 @@ void AppHandler::onWriteCharacteristic(const ble_gatts_evt_write_t * aWrite) {
 
 		// isValidWrite already ensures length is proper i.e. 4
 
-		// TODO move deserialization
+		// TODO move deserialization, deserialize directly to provision result and save a copy
 		ProvisionedValueType provision;
 		// Deserialize
 		// Must match serialization in client
@@ -59,15 +59,15 @@ void AppHandler::onWriteCharacteristic(const ble_gatts_evt_write_t * aWrite) {
 	}
 	else {
 		/*
-		 * Unexpected:
-		 * Not a standard or unknown characteristic,
-		 * and not one that my app has defined.
+		 * Somewhat expected:
+		 *  - a standard BT characteristic from BT devices.
+		 *  - unknown BT characteristic from foreign devices
 		 */
-		RTTLogger::log("Write to unexpected characteristic.");
+		// Already logged by isValidWrite: RTTLogger::log("Write unexpected BT chrcstc.");
 		/*
-		 * Tell Provisioner so it can truncate session, so session is not indefinite.
+		 * Not tell Provisioner: Provisioner::onBLEError() since that truncates session.
+		 * TODO how prevent foreign devices from prolonging our session?
 		 */
-		Provisioner::onBLEError();
 	}
 }
 

@@ -154,11 +154,12 @@ bool Characteristic::isValidWrite(const ble_gatts_evt_write_t * aWrite)
 	bool result = true;
 	if ( !( aWrite->uuid.type == 3 ) ) { 	// UUID is long
 		result = false;
-		RTTLogger::log("UUID wrong.\n");
+		RTTLogger::log("UUID type bad.\n");
+		RTTLogger::log(aWrite->uuid.type);
 	}
 	else if ( ! ( aWrite->len == Provisioner::ProvisionedCharacteristicLength ) ) {
 		result = false;
-		RTTLogger::log("Length wrong.\n");
+		RTTLogger::log("UUID len bad.\n");
 	}
 	else if ( aWrite->data[1] > 3 ){
 		/*
@@ -167,7 +168,7 @@ bool Characteristic::isValidWrite(const ble_gatts_evt_write_t * aWrite)
 		 * requires that index is in range of provisionable values.
 		 */
 		result = false;
-		RTTLogger::log("Index wrong.\n");
+		RTTLogger::log("UUID index bad.\n");
 	}
 	return result;
 }

@@ -13,12 +13,20 @@
 
 
 
+enum class ProvisioningSessionResult {
+	Unknown,
+	WasProvisioned,
+	NotProvisioned
+};
 
 
 namespace {
 
+
 bool isProvisioningFlag = false;
-bool provisioningSessionResult = false;
+
+// Results of provisioning session
+ProvisioningSessionResult provisioningSessionResult = ProvisioningSessionResult::Unknown;
 ProvisionedValueType provision;
 
 ProvisioningSucceedCallback succeedCallback = nullptr;
@@ -29,15 +37,18 @@ ProvisioningFailCallback failCallback = nullptr;
 
 
 
-// assert not in interrupt context, app is not realtime constrained.
+// !!! in ISR context, app must return shortly
 void callbackAppWithProvisioningResult() {
-	if (provisioningSessionResult ) {
-		 // assert SoftdeviceSleeper::getReasonForSDWake() == ReasonForSDWake::Canceled
-
+	switch (provisioningSessionResult ) {
+	case ProvisioningSessionResult::WasProvisioned:
 		succeedCallback(provision, RSSI::getConnectionRSSI() );
-	}
-	else {
+		break;
+	case ProvisioningSessionResult::NotProvisioned:
 		failCallback();
+		break;
+	case ProvisioningSessionResult::Unknown:
+		// Should not be called with Unknown result
+		assert(false);
 	}
 }
 
@@ -53,11 +64,15 @@ void Provisioner::init(ProvisioningSucceedCallback aSucceedCallback, Provisionin
 	succeedCallback = aSucceedCallback;
 	failCallback = aFailCallback;
 
-	// TimerAdaptor::create(provisionElapsedTimerHandler);
+	// OLD: TimerAdaptor::create(provisionElapsedTimerHandler);
 
 	assert(! Provisioner::isProvisioning());	// enabled but not started
 }
 
+
+
+
+bool Provisioner::isProvisioning() { return isProvisioningFlag; }
 
 
 /*
@@ -73,6 +88,8 @@ APIError Provisioner::start() {
 	// assert self initialized
 	assert(succeedCallback != nullptr);
 
+	provisioningSessionResult = ProvisioningSessionResult::Unknown;
+
 	APIError startResult;
 	startResult = ProtocolStack::startup();
 	if ( startResult == APIError::BLEStartedOK  ) {
@@ -80,6 +97,7 @@ APIError Provisioner::start() {
 	}
 	return startResult;
 }
+
 
 void Provisioner::shutdown() {
 	//RTTLogger::log("Provisioner shutdown");
@@ -101,50 +119,54 @@ void Provisioner::shutdown() {
 
 
 
-
-
-
-
-
-/*
- * onProvisioned() and onTimerElapsed() are two reasons to end a session
- * Should be similar implementations
- */
-
-
 /*
  * Called from SD, from a handler.
- * In interrupt context.
- * You can't shutdown SD at such a time?
+ * In ISR context.
+ * You can't shutdown SD at such a time.
  * Because it returns to the SD's chain of handlers.
  */
 void Provisioner::onProvisioned(ProvisionedValueType aProvision) {
 	assert(isProvisioning());
 
-	// We did not timeout, cancel timer.
-	// TimerAdaptor::stop();
+	// We did not timeout, cancel any timer.   OLD: TimerAdaptor::stop();
 
 	RSSI::captureLastRSSI();
 
 	/*
-	 * Tell SoftdeviceSleeper to quit its sleeping loop.
-	 * Semantics are one-shot: any one provisioning ends sleep and session.
+	 * Semantics are one-shot: any one provisioning disconnects and ends provisioning session.
+	 * But that is responsibility of app, to disable SD when provisioning succeeds.
 	 */
+	// OLD: Tell SoftdeviceSleeper to quit its sleeping loop.
 	// SoftdeviceSleeper::setReasonForSDWake(ReasonForSDWake::Canceled);
 
 	provision = aProvision;
-	provisioningSessionResult = true;
+	provisioningSessionResult = ProvisioningSessionResult::WasProvisioned;
 
 	/*
-	 * Continuation is return to Softdevice handler,
-	 * then eventually to after call to SoftdeviceSleeper in provisionWithSleep().
-	 * There we will callback app (when not in interrupt context)
+	 * Context is ISR.
+	 * Continuation is return to Softdevice handler.
+	 *
+	 * OLD: eventually to after call to SoftdeviceSleeper in provisionWithSleep().
+	 * There we will callback app (when not in ISR context)
+	 *
+	 * NEW: callback app with result.
+	 * App will schedule next task (pend interrupt that will execute after this ISR finishes.)
 	 */
+	callbackAppWithProvisioningResult();
 }
 
 
+void Provisioner::onAdvertisingTimeout() {
+	provisioningSessionResult = ProvisioningSessionResult::NotProvisioned;
+	callbackAppWithProvisioningResult();
+}
 
-
+void Provisioner::onBLEError() {
+	// TODO the app might want to do something else if there are persistent errors.
+	// Not a separate callback for errors: fail means nothing in range, or error
+	provisioningSessionResult = ProvisioningSessionResult::NotProvisioned;
+	callbackAppWithProvisioningResult();
+}
 
 
 #ifdef OBSOLETE
@@ -161,36 +183,3 @@ void Provisioner::sleep() {
 	SoftdeviceSleeper::sleepInSDUntilAnyEvent();
 }
 #endif
-
-
-
-
-
-
-bool Provisioner::isProvisioning() {
-	return isProvisioningFlag;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-void Provisioner::onAdvertisingTimeout() {
-	// Require results is still false, to ensure callback is the failCallback
-	assert(provisioningSessionResult == false);
-	callbackAppWithProvisioningResult();
-}
-
-void Provisioner::onBLEError() {
-	// Not a separate callback for errors: fail means nothing in range, or error
-	assert(provisioningSessionResult == false);
-	callbackAppWithProvisioningResult();
-}
-
