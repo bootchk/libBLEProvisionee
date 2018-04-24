@@ -43,6 +43,9 @@ nRF5SDKSourcesBLE()
 
 # note the logical name does not have prefix "lib", which cmake adds 
 # note sources specified later
+
+
+
 add_library(BLEProvisionee "" )
 set_target_properties( BLEProvisionee
     PROPERTIES
@@ -53,15 +56,17 @@ set_target_properties( BLEProvisionee
 nRF5ConfigTargetByProperties(BLEProvisionee)
 
 
-
-add_library(BLEProvisionee52810e "" )
-set_target_properties( BLEProvisionee52810e
+# !!! Only ..52810 not ..52810e
+# e suffix only affects startup files for compiling main app
+# Probably we could just build one for 52xxx, but I am not sure the Softdevice headers are the same.
+add_library(BLEProvisionee52810 "" )
+set_target_properties( BLEProvisionee52810
     PROPERTIES
        CHIP "nrf52810e"
        SOFTDEVICE "s112"
        FLOAT_ABI "soft"
     )
-nRF5ConfigTargetByProperties(BLEProvisionee52810e)
+nRF5ConfigTargetByProperties(BLEProvisionee52810)
 
 
 
@@ -146,7 +151,7 @@ target_include_directories(BLEProvisionee
        "/home/bootch/git/radioSoC/src"
        )
 # Same for 52810
-target_include_directories(BLEProvisionee52810e
+target_include_directories(BLEProvisionee52810
    PUBLIC
        "${CMAKE_CURRENT_LIST_DIR}"
        "${CMAKE_CURRENT_LIST_DIR}/objects"
@@ -185,8 +190,8 @@ target_sources(BLEProvisionee
        "${FacadeSources}"
        "${SDK_SOURCES}"
    )
-# Same sources for 52810 variant emulated
-target_sources(BLEProvisionee52810e
+# Same sources for 52810
+target_sources(BLEProvisionee52810
    PUBLIC
        "${FacadeSources}"
        "${SDK_SOURCES}"
