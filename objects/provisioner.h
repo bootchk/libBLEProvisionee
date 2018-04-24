@@ -43,7 +43,7 @@ typedef struct ProvisionedValue {
 typedef void (*ProvisioningSucceedCallback)(
 		ProvisionedValueType value,
 		int8_t rssi);
-typedef void (*ProvisioningFailCallback)();
+typedef void (*ProvisioningFailCallback)(void);
 
 
 #ifdef OBSOLETE
