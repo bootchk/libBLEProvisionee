@@ -156,11 +156,12 @@ Uses CMake and a command line.
 
 First:
 
-    - edit CMakeEnv.cmake (in your clone of nRF5Cmake repository)
-    - edit toolchain-gnu-arm.cmake (in your clone of nRF5Cmake repository)
+    In your clone of nRF5Cmake repository:
+    - edit CMakeEnv.cmake 
+    - edit toolchain-gnu-arm.cmake
     
-    mkdir Debug
-    cd Debug
+    mkdir cmakeBuild
+    cd cmakeBuild
     cmake    -G "Ninja"    -DCMAKE_TOOLCHAIN_FILE=/home/bootch/git/nRF5Cmake/toolchain-gnu-arm.cmake     ..
     #       ninja, not make     use toolchain file                                look in parent dir for CMakeLists.txt
     cmake --build .               --target testLibBLEProvisionee
@@ -176,11 +177,11 @@ If you don't want the test harness:  --target BLEProvisionee
 
 At least once burn the Softdevice (a layer implementing BT) to a separate area of ROM:
 
-    cmake --build "Debug" --target FLASH_SOFTDEVICE
+    cmake --build "cmakeBuild" --target FLASH_SOFTDEVICE
     
 To burn to a NRF52DK dev board:
 
-    cmake --build "Debug" --target FLASH_testLibBLEProvisionee
+    cmake --build "cmakeBuild" --target FLASH_testLibBLEProvisionee
     
 The app will start running on the DK, and periodically advertise its "provisioning" service.
 In very short bursts (2mSec) which you might need to change.
